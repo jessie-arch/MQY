@@ -19,6 +19,7 @@ const catData: mockData = [
 function Home() {
     return (
         <div>
+            <Link to="/user">个人主页</Link>
             {/* 动态列 */}
             {data.map(item => (
                 <div key={item.id} >
