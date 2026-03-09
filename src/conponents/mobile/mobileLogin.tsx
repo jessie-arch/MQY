@@ -1,10 +1,13 @@
-
+import { Link } from 'react-router-dom'
 //登录页
- function MobileLogin () {
-  return(
+function Login() {
+  return (
     <div>
-      <h3>登录</h3>
+
+      <Link to="/register">没有登录?前往注册</Link>
+      <div></div>
+      <Link to="./home">登录</Link>
     </div>
   )
- }
- export default MobileLogin;
+}
+export default Login;
