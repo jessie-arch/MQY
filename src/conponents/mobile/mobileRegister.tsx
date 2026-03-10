@@ -3,8 +3,7 @@ import { Link } from "react-router-dom"
 function Register() {
     return (
         <div>
-      //这里保存账户信息,让用户再输一次密码
-            <Link to="/">注册</Link>
+          <Link to="./home">注册</Link>
         </div>
     )
 }
