@@ -1,14 +1,15 @@
-import {Link} from "react-router-dom"
 
+import { RegisterBanner } from "../shared/RegisterBannel"
+import './webRegister.modules.css'
 //注册页
  async function Register () {
  
   return(
   
-    <div>
-    
+    <div className = "register">
+      <RegisterBanner/>
       
-      <Link to="./home">注册</Link>
+     
     </div>
   )
  }

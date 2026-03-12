@@ -4,5 +4,12 @@
   --radius:25px;
   --bg-color:#FEFBEC;
   --re-grey:#A6A6A6;
+ 
+}
+
+a{
+  text-decoration: none;
+  color: inherit;
+  cursor: default;
 
 }

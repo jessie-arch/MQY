@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom"
+import style from './mobileRegister.module.css'
+import { RegisterBanner } from "../shared/RegisterBannel"
+
 //注册页
 function Register() {
     return (
-        <div>
-          <Link to="./home">注册</Link>
+        <div className={style.register}>
+          <RegisterBanner/>
         </div>
     )
 }
