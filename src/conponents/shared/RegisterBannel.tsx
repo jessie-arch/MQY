@@ -1,15 +1,14 @@
   import styles from './RegistrtBannel.module.css'
   import { useState,useRef,useEffect } from 'react'
- import {Link} from "react-router-dom"
- import {FetchpreAvator} from '../../service/loginFetch'
-  export function RegisterBanner() {
-      type tavator = {
+ import {useNavigate} from "react-router-dom"
+ import {FetchpreAvator,SubmitForm,SubmitImage} from '../../service/loginFetch'
+   type tavator = {
         file:File | null,
         loading:boolean,
         preView:string,
         url:string
       }
-      
+  export function RegisterBanner() {
       const [loginupForm,setLoginupForm] = useState({
         userName:'',
         password:'',
@@ -17,19 +16,22 @@
       });
       const [ uploadURL,setUploadURL] = useState('');
       const marked = useRef(false);
-    
       const [avator,setAvator] = useState<tavator>({
          file:null,
          loading:false,
          preView:'', //预览的本地url
          url:''
       })
-     
       const inputRef = useRef<HTMLInputElement>(null);
-
+     const Navigate = useNavigate();
 
     //上传图片相关
      const handClick = () => { inputRef.current?.click() };
+     const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if(file){
+     processFile(file);
+  }};
 
      const handleDrop = (e:React.DragEvent<HTMLDivElement>) => {
        e.preventDefault();
@@ -48,14 +50,6 @@
         url:''
        })
     }
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('1')
-    const file = e.target.files?.[0];
-    if(file){
-     processFile(file);
-  }
-  };
 
     const deleteImg = () =>{
      setAvator({
@@ -78,18 +72,41 @@
         });
          setUploadURL(res.data.uploadURL);
       }
-      console.log(res);
     }
 
     useEffect (()=>{
     if(marked.current === true) {return;}
-    else{ getPremark(); 
+    else{
+       getPremark(); 
       marked.current = true;
     }
     },[])
-     
+    //提交图片
+     const subImg =() => {
+      const file:File | null = avator.file
+      if(!file || ! uploadURL ) return ;
+      SubmitImage({file,uploadURL})
+     }
+    //提交表单
+    const handleInputpassWord = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLoginupForm({
+        ...loginupForm,
+        password:e.target.value
+      })
+    }
+    const handleInputusername = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLoginupForm({
+        ...loginupForm,
+        userName:e.target.value
+      })
+    }
+    const Submit = () => {
+      subImg();
+      SubmitForm(loginupForm);
+      Navigate('/home');
+    }
 
-
+ 
      //条件渲染相关
      const addImage = () => {
       return(
@@ -106,7 +123,7 @@
               </div>
               )
      }
-
+   
     return( 
       <div className={styles.loginBanner} >
        {avator.file === null ? addImage(): null }
@@ -115,16 +132,16 @@
        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {handleFileInputChange(e)}}/>
        <div className={`iconfont icon-cha ${styles.out}`}/>
        <div className={styles.userName}>
-         <input type='text' placeholder='username'/>
+         <input type='text' placeholder='username' value={loginupForm.userName} onChange={handleInputusername}/>
        </div> 
         <div className={styles.passWord}>
-          <input type='password' placeholder='password'/>
+          <input type='password' placeholder='password' value={loginupForm.password} onChange={handleInputpassWord}/>
         </div> 
-        <Link to="/home">
-        <button className={styles.btn}>
+       
+        <button className={styles.btn} onClick={Submit}>
           注   册
           </button>
-          </Link> 
+          
       </div>
     )
   }
