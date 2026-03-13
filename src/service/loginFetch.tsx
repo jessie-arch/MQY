@@ -1,13 +1,13 @@
 import {request} from '../utils/myFetch'
-import {setToken} from '../utils/token'
+import {getToken, setToken} from '../utils/token'
 
 //预签名
 type preMark = {
         code:number,
         msg:string,
         data:{
-          uploadURL:string,
-          objectKey:string
+          upload_url:string,
+          object_key:string
         }
       }
 
@@ -21,17 +21,17 @@ export async function FetchpreAvator () {
 
 //注册表单提交
 type Submit = {
-  userName:string,
+  username:string,
   password:string,
-  objectKey:string
+  avatar_key:string
 }
 type returnSubmit = {
    code:number,
   msg:string,
   data:{
-    userId:number,
-    token:string,
-    expiresIn:number
+    user_id:number,
+    access_token:string,
+    expires_in:number
   }
 }
 export async function SubmitForm (props:Submit) {
@@ -40,19 +40,52 @@ export async function SubmitForm (props:Submit) {
     method:'POST',
     data:props,
   })
-   setToken(res.data.token);
+  setToken(res.data.access_token);
    return res;
 }
 
+//上传图片
 type SubmitImage = {
   file:File,
   uploadURL:string,
 }
 export async function SubmitImage (props:SubmitImage) {
-  const res = await request({
-    url:'/auth/avatar-upload-url',
+ const res = await fetch(props.uploadURL,{
     method:'PUT',
-    data:props
+    body:props.file,
+    headers:{
+      'Content-Type':'image/jpeg',
+       'Accept': '*/*'
+    }
   })
+  if(!res.ok){
+     console.error('图片上传失败:', res.status, res.statusText);
+      throw new Error(`OSS上传失败: ${res.status}`);
+  }
+} 
+type LoginType = {
+  username:string,
+  password:string
+}
+
+type Loginres = {
+   code:number,
+   msg:string,
+   data:{
+    user_id:string;
+    access_token:string;
+    expires_in :number;
+   }
+}
+ 
+//登录
+export async function LoginSubmit (props:LoginType) {
+  const res: Loginres = await request({
+    url:'/auth/login',
+    method:'POST',
+    data:props,
+  })
+  // setToken(res.data.access_token);
+  console.log(res);
   return res;
 }

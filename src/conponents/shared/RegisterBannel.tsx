@@ -2,6 +2,7 @@
   import { useState,useRef,useEffect } from 'react'
  import {useNavigate} from "react-router-dom"
  import {FetchpreAvator,SubmitForm,SubmitImage} from '../../service/loginFetch'
+ import {getres} from '../../utils/addSecret'
    type tavator = {
         file:File | null,
         loading:boolean,
@@ -10,9 +11,9 @@
       }
   export function RegisterBanner() {
       const [loginupForm,setLoginupForm] = useState({
-        userName:'',
+        username:'',
         password:'',
-        objectKey:''
+       avatar_key:''
       });
       const [ uploadURL,setUploadURL] = useState('');
       const marked = useRef(false);
@@ -65,12 +66,12 @@
     //预签名
     const getPremark = async () => {
       const res =  await FetchpreAvator();
-      if(res){
+      if(res.data){
         setLoginupForm({
         ...loginupForm,
-        objectKey:res.data.objectKey,
+       avatar_key:res.data.object_key,
         });
-         setUploadURL(res.data.uploadURL);
+         setUploadURL(res.data.upload_url);
       }
     }
 
@@ -85,7 +86,8 @@
      const subImg =() => {
       const file:File | null = avator.file
       if(!file || ! uploadURL ) return ;
-      SubmitImage({file,uploadURL})
+       SubmitImage({file,uploadURL})
+     
      }
     //提交表单
     const handleInputpassWord = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,11 +99,17 @@
     const handleInputusername = (e: React.ChangeEvent<HTMLInputElement>) => {
       setLoginupForm({
         ...loginupForm,
-        userName:e.target.value
+        username:e.target.value
       })
     }
     const Submit = () => {
       subImg();
+      getres(loginupForm.password).then((res) => {
+          setLoginupForm({
+            ...loginupForm,
+            password:res
+          })
+      })
       SubmitForm(loginupForm);
       Navigate('/home');
     }
@@ -123,23 +131,23 @@
               </div>
               )
      }
-   
+     
     return( 
       <div className={styles.loginBanner} >
        {avator.file === null ? addImage(): null }
             {avator.file === null ? null : showImage()}
                <input ref={inputRef} type="file" accept="image/jpeg" style={{display:'none'}} 
        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {handleFileInputChange(e)}}/>
-       <div className={`iconfont icon-cha ${styles.out}`}/>
+       <div className={`iconfont icon-cha ${styles.out}`} onClick={() => {Navigate('/')}}/>
        <div className={styles.userName}>
-         <input type='text' placeholder='username' value={loginupForm.userName} onChange={handleInputusername}/>
+         <input type='text' placeholder='username' value={loginupForm.username} onChange={handleInputusername}/>
        </div> 
         <div className={styles.passWord}>
           <input type='password' placeholder='password' value={loginupForm.password} onChange={handleInputpassWord}/>
         </div> 
        
         <button className={styles.btn} onClick={Submit}>
-          注   册
+          注&nbsp;&nbsp;&nbsp;册
           </button>
           
       </div>

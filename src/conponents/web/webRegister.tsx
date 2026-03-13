@@ -1,12 +1,12 @@
 
 import { RegisterBanner } from "../shared/RegisterBannel"
-import './webRegister.modules.css'
+import style from '../shared/RegitserLoginbackkgroud.module.css'
 //注册页
- async function Register () {
+ function Register () {
  
   return(
   
-    <div className = "register">
+    <div className={style.register}>
       <RegisterBanner/>
       
      

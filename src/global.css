@@ -13,3 +13,11 @@ a{
   cursor: default;
 
 }
+ input{
+  color:var(--re-grey) ;
+ padding-left: 4%;
+ border:none;
+ background-color: transparent;
+ outline:none;
+ font-size: 3dvh;
+}

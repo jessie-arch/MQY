@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom"
-import style from './mobileRegister.module.css'
+import style from '../shared/RegitserLoginbackkgroud.module.css'
 import { RegisterBanner } from "../shared/RegisterBannel"
 
 //注册页

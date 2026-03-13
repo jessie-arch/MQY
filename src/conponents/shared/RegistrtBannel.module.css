@@ -66,13 +66,7 @@
      display: flex;
      align-items: center;
 }
-.userName input{
-  color:var(--re-grey) ;
- padding-left: 4%;
- border:none;
- background-color: transparent;
- outline:none;
-}
+
 .passWord{
   composes: userName;
   margin-top:5%;
@@ -83,7 +77,7 @@
   display: flex;
  align-items: center;
  justify-content: center;
- font-size: larger;
+ font-size: 3dvh;
  background-color: var(--theme-color);
  color:white;
 }
