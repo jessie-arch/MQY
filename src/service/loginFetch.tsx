@@ -85,7 +85,6 @@ export async function LoginSubmit (props:LoginType) {
     method:'POST',
     data:props,
   })
-  // setToken(res.data.access_token);
-  console.log(res);
+   setToken(res.data.access_token);
   return res;
 }

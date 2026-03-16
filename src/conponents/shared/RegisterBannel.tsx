@@ -3,20 +3,26 @@
  import {useNavigate} from "react-router-dom"
  import {FetchpreAvator,SubmitForm,SubmitImage} from '../../service/loginFetch'
  import {getres} from '../../utils/addSecret'
+import { getToken } from '../../utils/token'
+import {setError} from '../../store/slSlice'
+
+import { useDispatch } from 'react-redux'
    type tavator = {
         file:File | null,
         loading:boolean,
         preView:string,
         url:string
       }
+
   export function RegisterBanner() {
+    const dispatch = useDispatch()
       const [loginupForm,setLoginupForm] = useState({
         username:'',
         password:'',
        avatar_key:''
       });
       const [ uploadURL,setUploadURL] = useState('');
-      const marked = useRef(false);
+   
       const [avator,setAvator] = useState<tavator>({
          file:null,
          loading:false,
@@ -67,25 +73,27 @@
     const getPremark = async () => {
       const res =  await FetchpreAvator();
       if(res.data){
-        setLoginupForm({
-        ...loginupForm,
+        setLoginupForm(prev => ({
+        ...prev,
        avatar_key:res.data.object_key,
-        });
+        }));
          setUploadURL(res.data.upload_url);
       }
     }
 
     useEffect (()=>{
-    if(marked.current === true) {return;}
-    else{
+      let flag = true;
+      if(!flag) return;
        getPremark(); 
-      marked.current = true;
-    }
+      return(()=>{
+        flag = false;
+      })
     },[])
+    
     //提交图片
      const subImg =() => {
       const file:File | null = avator.file
-      if(!file || ! uploadURL ) return ;
+      if(!file || ! uploadURL ) return dispatch(setError('请上传图片'));
        SubmitImage({file,uploadURL})
      
      }
@@ -102,17 +110,26 @@
         username:e.target.value
       })
     }
-    const Submit = () => {
-      subImg();
-      getres(loginupForm.password).then((res) => {
-          setLoginupForm({
-            ...loginupForm,
-            password:res
-          })
-      })
-      SubmitForm(loginupForm);
-      Navigate('/home');
-    }
+
+    const Submit = async () => {
+      if (!loginupForm.username  || !loginupForm.password || !loginupForm.avatar_key) {
+        dispatch(setError('请完整输入用户名，密码，头像'));
+        return;
+      }
+      try{
+       const encryptedPwd = await getres(loginupForm.password);
+       await subImg();
+      await SubmitForm({ ...loginupForm, password: encryptedPwd });
+      const token = getToken();
+      if (token) {
+        Navigate('/home');
+      } else {
+        dispatch(setError('注册失败'));
+      }
+      }catch (err) {
+         dispatch(setError((err as Error).message || '注册失败'));
+    } }
+    
 
  
      //条件渲染相关
@@ -152,4 +169,5 @@
           
       </div>
     )
-  }
+  
+}

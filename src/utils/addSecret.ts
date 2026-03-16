@@ -1,5 +1,5 @@
    async function Addsecret(password:string) {
-     const SALT = 'your-custom-salt-2026'; 
+     const SALT = 'mqy-secret-2026'; 
       const saltedPwd = password + SALT;
        const encoder = new TextEncoder();
         const data = encoder.encode(saltedPwd);

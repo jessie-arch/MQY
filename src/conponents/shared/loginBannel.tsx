@@ -3,8 +3,13 @@ import {useState, useRef} from 'react'
 import { useNavigate,Link } from 'react-router-dom'; 
 import {LoginSubmit} from '../../service/loginFetch'
 import {getres} from '../../utils/addSecret'
+import { getToken } from '../../utils/token';
+import {setError} from '../../store/slSlice'
+import { useDispatch } from 'react-redux';
+
 
 export function LoginBannel () {
+  const dispatch = useDispatch();
   const Navigate = useNavigate();
   const [showFlag,setShowFlag] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -29,18 +34,25 @@ export function LoginBannel () {
       })
     }
     //登录
-    const loginSubmit = () =>{
-      if(logininForm.username !='admin'){
-        getres(logininForm.password).then((res) => {
-          setLogininForm({
-        ...logininForm,
-        password:res
-      })
-        })
-      }
-      LoginSubmit(logininForm);
-         Navigate('/home');
+const loginSubmit = async () => {
+  if (!logininForm.username || !logininForm.password) {
+    dispatch(setError('请输入用户名或密码'));
+    return;
+  }
+  try {
+    let formToSubmit = { ...logininForm };
+    if (logininForm.username !== 'admin') {
+      const encryptedPassword = await getres(logininForm.password);
+      formToSubmit = { ...formToSubmit, password: encryptedPassword };
     }
+    await LoginSubmit(formToSubmit);
+    if (getToken() !== null) {
+      Navigate('/home'); 
+    }
+  } catch (err: any) {
+   dispatch(setError(err.message));
+  }
+};
   return(
     <div className={style.loginBanner}>
       <h1>登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</h1>

@@ -29,9 +29,8 @@ export async function request<T>({ url, data, useToken = false, ...options }: Fe
   });
 
   if (!res.ok) {
-    // 统一错误处理
     const errText = await res.text();
-    throw new Error(`Request failed: ${res.status} ${errText}`);
+    throw new Error(errText);
   }
 
   return res.json();
