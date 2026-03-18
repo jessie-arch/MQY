@@ -6,6 +6,7 @@ const Detail = lazy(() => import('../conponents/web/webdetail'));
 const AdoptDetail = lazy(() => import('../conponents/web/webadoptDetail'));
 const Login = lazy(() => import('../conponents/web/weblogin'));
 const Register = lazy(() => import('../conponents/web/webRegister'));
+import Layout from '../conponents/shared/layOut'
 
 const Guard = ({children}:{children:ReactNode}) => {
  const isLogin = getToken();
@@ -15,30 +16,33 @@ const Guard = ({children}:{children:ReactNode}) => {
  return children;
 }
 
- const webRouter = createBrowserRouter([
-{
-  path:"/home",
-  element:<Guard><Home/></Guard>,
-  children:[
-    {
-  path:"detail/:id",
-  element:<Guard><Detail/></Guard>
-},
-{
-  path:"adoptDetail/:id",
-  element:<Guard><AdoptDetail/></Guard>
-}
-  ]
-},
-{
-  path:"/",
-  element:getToken()
-  ? <Navigate to="/home"/>
-  : <Login/>
-},{
-  path:"/register",
-  element:<Register/>
-}
-
+const webRouter = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: getToken() ? <Navigate to="/home" /> : <Login />
+      },
+      {
+        path: "/register",
+        element: <Register />
+      },
+      {
+        path: "/home",
+        element: <Guard><Home /></Guard>,
+        children: [
+          {
+            path: "detail/:id",
+            element: <Guard><Detail /></Guard>
+          },
+          {
+            path: "adoptDetail/:id",
+            element: <Guard><AdoptDetail /></Guard>
+          }
+        ]
+      }
+    ]
+  }
 ])
 export default webRouter;

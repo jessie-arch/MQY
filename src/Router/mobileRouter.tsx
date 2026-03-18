@@ -7,7 +7,7 @@ const AdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'))
 const Login = lazy(() => import('../conponents/mobile/mobileLogin'));
 const Register = lazy(() => import('../conponents/mobile/mobileRegister'));
 const User = lazy(() => import('../conponents/mobile/mobileUser'));
-
+import Layout from '../conponents/shared/layOut'
 const Guard = ({children}:{children:ReactNode}) => {
  const isLogin = getToken();
  if(!isLogin){
@@ -18,33 +18,36 @@ const Guard = ({children}:{children:ReactNode}) => {
 
 const mobileRouter = createBrowserRouter([
   {
-    path: "/home",
-    element: <Guard><Home/></Guard>,
+    element: <Layout />,
     children: [
       {
-        path: "detail/:id",
-        element: <Guard><Detail/></Guard>
+        path: "/",
+        element: getToken() ? <Navigate to="/home" /> : <Login />
       },
       {
-        path: "adoptDetail/:id",
-        element: <Guard><AdoptDetail/></Guard>
+        path: "/register",
+        element: <Register />
+      },
+      {
+        path: "/home",
+        element: <Guard><Home /></Guard>,
+        children: [
+          {
+            path: "detail/:id",
+            element: <Guard><Detail /></Guard>
+          },
+          {
+            path: "adoptDetail/:id",
+            element: <Guard><AdoptDetail /></Guard>
+          }
+        ]
+      },
+      {
+        path: "/user",
+        element: <Guard><User /></Guard>
       }
     ]
-  },
-  {
-    path: "/user",
-    element: <Guard><User/></Guard>
-  },
-  {
-    path: "/",
-   element:getToken()
-      ? <Navigate to="/home"/>
-      : <Login/>
-  },
-  {
-    path: "/register",
-    element: <Register />
   }
-]);
+])
 
 export default mobileRouter;
