@@ -17,6 +17,9 @@
   font-size: 10dvh;
   color: var( --re-grey);
 }
+.addImg:hover{
+  color: var(--theme-color);
+}
 .avator{
  width: 100%;
  height: 100%;
@@ -45,6 +48,7 @@
   border-radius: 50%;
   background-color: white;
 }
+
 .out{
     position: relative;
     top:-25%;

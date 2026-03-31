@@ -5,8 +5,8 @@ const Home = lazy(() => import('../conponents/web/webHome'));
 const Detail = lazy(() => import('../conponents/web/webdetail'));
 const AdoptDetail = lazy(() => import('../conponents/web/webadoptDetail'));
 const Login = lazy(() => import('../conponents/web/weblogin'));
-const Register = lazy(() => import('../conponents/web/webRegister'));
-import Layout from '../conponents/shared/layOut'
+const Register = lazy(() => import('../conponents/shared/register/RegisterBannel'));
+import Layout from '../conponents/shared/globalComponent/layOut'
 
 const Guard = ({children}:{children:ReactNode}) => {
  const isLogin = getToken();

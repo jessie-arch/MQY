@@ -1,5 +1,5 @@
 import {request} from '../utils/myFetch'
-import {getToken, setToken} from '../utils/token'
+import { setToken} from '../utils/token'
 
 //预签名
 type preMark = {
@@ -59,7 +59,7 @@ export async function SubmitImage (props:SubmitImage) {
     }
   })
   if(!res.ok){
-     console.error('图片上传失败:', res.status, res.statusText);
+      console.error('图片上传失败:', res.status, res.statusText);
       throw new Error(`OSS上传失败: ${res.status}`);
   }
 } 

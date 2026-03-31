@@ -1,10 +1,10 @@
   import styles from './RegistrtBannel.module.css'
   import { useState,useRef,useEffect } from 'react'
  import {useNavigate} from "react-router-dom"
- import {FetchpreAvator,SubmitForm,SubmitImage} from '../../service/loginFetch'
- import {getres} from '../../utils/addSecret'
-import { getToken } from '../../utils/token'
-import {setError} from '../../store/slSlice'
+ import {FetchpreAvator,SubmitForm,SubmitImage} from '../../../service/loginFetch'
+ import {getres} from '../../../utils/addSecret'
+import { getToken } from '../../../utils/token'
+import {setError} from '../../../store/slSlice'
 
 import { useDispatch } from 'react-redux'
    type tavator = {
@@ -135,7 +135,7 @@ import { useDispatch } from 'react-redux'
      //条件渲染相关
      const addImage = () => {
       return(
-      <div className={`iconfont icon-jjia- ${styles.addImg}`} onClick= {handClick}
+      <div className={`iconfont icon-jumao ${styles.addImg}`} onClick= {handClick}
         onDragOver={(e: React.DragEvent<HTMLDivElement>) => e.preventDefault()}
         onDrop={handleDrop}/>
       )

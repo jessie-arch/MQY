@@ -7,7 +7,7 @@ const AdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'))
 const Login = lazy(() => import('../conponents/mobile/mobileLogin'));
 const Register = lazy(() => import('../conponents/mobile/mobileRegister'));
 const User = lazy(() => import('../conponents/mobile/mobileUser'));
-import Layout from '../conponents/shared/layOut'
+import Layout from '../conponents/shared/globalComponent/layOut'
 const Guard = ({children}:{children:ReactNode}) => {
  const isLogin = getToken();
  if(!isLogin){

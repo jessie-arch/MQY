@@ -1,6 +1,6 @@
 import { getToken } from "./token";
-const BASE_URL = "http://8.156.84.50:9090"; 
-
+ const BASE_URL = "http://8.156.84.50:9090"; 
+// const BASE_URL = "http://127.0.0.1:4523/m1/7881239-7631110-default"; 
 interface FetchOptions extends RequestInit {
   url: string;
   data?: any;          // body数据

@@ -1,6 +1,6 @@
-import style from '../shared/RegitserLoginbackkgroud.module.css'
+import style from '../shared/register/RegitserLoginbackkgroud.module.css'
 import { Link } from 'react-router-dom'
-import { LoginBannel } from '../shared/loginBannel';
+import { LoginBannel } from '../shared/login/loginBannel';
 
 //登录页
 function Login() {

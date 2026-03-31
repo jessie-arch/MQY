@@ -7,7 +7,7 @@ import router from "./Router/indexRouter";
 import { Suspense } from 'react'
 import { store } from './store/index'
 import { Provider } from 'react-redux'
-import {Alert} from './conponents/shared/wrongalert'
+import {Alert} from './conponents/shared/globalComponent/wrongalert'
 
 
 createRoot(document.getElementById('root')!).render(

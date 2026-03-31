@@ -1,10 +1,10 @@
 import style from './loginBannel.module.css'
 import {useState, useRef} from 'react'
 import { useNavigate,Link } from 'react-router-dom'; 
-import {LoginSubmit} from '../../service/loginFetch'
-import {getres} from '../../utils/addSecret'
-import { getToken } from '../../utils/token';
-import {setError} from '../../store/slSlice'
+import {LoginSubmit} from '../../../service/loginFetch'
+import {getres} from '../../../utils/addSecret'
+import { getToken } from '../../../utils/token';
+import {setError} from '../../../store/slSlice'
 import { useDispatch } from 'react-redux';
 
 
@@ -55,7 +55,7 @@ const loginSubmit = async () => {
 };
   return(
     <div className={style.loginBanner}>
-      <h1>登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</h1>
+      <h1 className={style.title}>登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</h1>
       <div className={style.userName}>
         <span className='iconfont icon-yonghu'></span>
         <input type='text'placeholder="username" value={logininForm.username} onChange={handleInputusername}></input>

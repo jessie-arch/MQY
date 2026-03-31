@@ -1,6 +1,6 @@
 import style from './wrongAlert.module.css'
 import { useDispatch,useSelector } from 'react-redux'
-import {clearError} from '../../store/slSlice'
+import {clearError} from '../../../store/slSlice'
 import {useRef,useEffect} from 'react'
   export  function Alert (){
     const dispatch = useDispatch();
