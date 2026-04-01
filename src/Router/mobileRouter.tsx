@@ -1,12 +1,12 @@
 import { lazy } from "react"
 import { createBrowserRouter } from "react-router-dom"
 
-const MobileHome = lazy(() => import('../conponents/mobile/mobileHome'));
-const MobileDetail = lazy(() => import('../conponents/mobile/mobileDetail'));
-const MobileAdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'));
+const MobileHome = lazy(() => import('../conponents/mobile/Home/mobileHome'));
+const MobileDetail = lazy(() => import('../conponents/mobile/Home/mobileDetail'));
+const MobileAdoptDetail = lazy(() => import('../conponents/mobile/Home/mobileadoptDetail'));
 const MobileLogin = lazy(() => import('../conponents/mobile/mobileLogin'));
 const MobileRegister = lazy(() => import('../conponents/mobile/mobileRegister'));
-const MobileUser = lazy(() => import('../conponents/mobile/mobileUser'));
+const MobileUser = lazy(() => import('../conponents/mobile/Home/mobileUser'));
 const mobileRouter = createBrowserRouter([
   {
     path: "/home",

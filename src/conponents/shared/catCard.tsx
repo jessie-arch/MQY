@@ -1,5 +1,5 @@
 import type { GalleryCat } from '../../service';
-import { getGenderText, getStateClass, getStateText } from '../web/webHome.utils';
+import { getGenderText, getStateClass, getStateText } from '../web/Home/webHome.utils';
 import style from '../web/webHome.module.css';
 import { useNavigate } from 'react-router-dom';
 interface CatCardProps {

@@ -1,5 +1,5 @@
 import searchDog from '../../assets/img/search.png';
-import { SearchSuggestions } from '../web/webSearch';
+import { SearchSuggestions } from '../web/Home/webSearch';
 import style from '../web/webHome.module.css';
 
 interface SearchBarProps {

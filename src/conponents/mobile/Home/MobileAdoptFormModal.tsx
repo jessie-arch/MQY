@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { request } from '../../utils/myFetch';
+import { request } from '../../../utils/myFetch';
 import styles from './MobileAdoptFormModal.module.css';
 
 interface MobileAdoptFormModalProps {

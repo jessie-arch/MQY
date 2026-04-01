@@ -1,5 +1,5 @@
 import type { PostItem } from '../../service';
-import { PLACEHOLDER_IMAGE, PLACEHOLDER_AVATAR } from '../web/webHome.constants';
+import { PLACEHOLDER_IMAGE, PLACEHOLDER_AVATAR } from '../web/Home/webHome.constants';
 import style from '../web/webHome.module.css';
 import { useNavigate } from 'react-router-dom';
 interface PostCardProps {

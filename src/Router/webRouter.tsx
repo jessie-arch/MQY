@@ -1,7 +1,7 @@
 import { lazy } from "react"
 import { createBrowserRouter } from "react-router-dom"
-const Home = lazy(() => import('../conponents/web/webHome'));
-const AdoptDetail = lazy(() => import('../conponents/web/webadoptDetail'));
+const Home = lazy(() => import('../conponents/web/Home/webHome'));
+const AdoptDetail = lazy(() => import('../conponents/web/Home/webadoptDetail'));
 const Login = lazy(() => import('../conponents/web/weblogin'));
 const Register = lazy(() => import('../conponents/web/webRegister'));
 
