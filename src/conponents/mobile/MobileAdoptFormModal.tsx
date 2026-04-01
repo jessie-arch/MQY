@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { catService } from '../../service';
+import { request } from '../../utils/myFetch';
 import styles from './MobileAdoptFormModal.module.css';
 
 interface MobileAdoptFormModalProps {
@@ -32,27 +32,25 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
         const fetchCatDetail = async () => {
             if (!catIdParam) return;
             try {
-                const res = await catService.getCatDetail(catIdParam);
+                const res = await request<any>({
+                    url: `/cat/detail/${catIdParam}`,
+                    method: 'GET',
+                    useToken: true
+                });
                 if (res.code === 200 && res.data) {
                     setCatInfo({
                         name: res.data.name,
                         avatar: res.data.avatar,
-                        gender: res.data.gender === 1 ? '妹妹' : '弟弟',
-                        neutered: '已绝育'
+                        gender: res.data.gender === 1 ? '弟弟' : '妹妹',
+                        neutered: res.data.neutered_status === 1 ? '已绝育' : '未绝育'
                     });
                 }
             } catch (error) {
                 console.error('获取猫咪信息失败:', error);
-                setCatInfo({
-                    name: catName || '月亮',
-                    avatar: '',
-                    gender: '妹妹',
-                    neutered: '已绝育'
-                });
             }
         };
         fetchCatDetail();
-    }, [catIdParam, catName]);
+    }, [catIdParam]);
 
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
@@ -81,12 +79,23 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
         setSubmitting(true);
 
         try {
-            const res = await catService.submitAdopt({
-                cat_id: Number(catIdParam),
-                contact_info: formData.contact,
-                reason: formData.reason,
-                info: formData.situation || undefined
-            });
+            const res = await request<any>({
+                url: '/cats',
+                method: 'POST',
+                data: {
+                    name: catInfo.name,
+                    gender: catInfo.gender === '弟弟' ? 1 : 0,
+                    neutered_status: catInfo.neutered === '已绝育' ? 1 : 2,
+                    birth_date: "2022-01-01",
+                    arrival_date: "2023-01-01",
+                    state: 1,
+                    coat_color: 1,
+                    position: "待领养",
+                    story: `领养人：${formData.contact}，领养原因：${formData.reason}，家庭情况：${formData.situation || '无'}`,
+                    avatar_key: ""
+                },
+                useToken: true
+            });;
 
             if (res.code === 200) {
                 alert('提交成功！我们会尽快联系您');
@@ -97,7 +106,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
             }
         } catch (error: any) {
             console.error('提交失败:', error);
-            if (error.message?.includes('401') || error.message?.includes('未登录')) {
+            if (error.message?.includes('401')) {
                 alert('请先登录');
                 navigate('/');
             } else {
@@ -107,6 +116,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
             setSubmitting(false);
         }
     };
+
 
     return (
         <div className={styles.overlay} onClick={handleBackdropClick}>

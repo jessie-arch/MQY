@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { request } from '../../utils/myFetch';
 import { catService } from '../../service';
 import styles from './AdoptFormModal.module.css';
 
@@ -8,7 +9,25 @@ interface AdoptFormModalProps {
     catName?: string;
     catId?: string;
 }
-
+// 添加响应类型定义
+interface ApiResponse<T = any> {
+    code: number;
+    msg: string;
+    data?: T;
+}
+interface CatDetail {
+    id: number;
+    name: string;
+    avatar: string;
+    gender: number;
+    neutered_status: number;
+    birth_date: string;
+    arrival_date: string;
+    state: number;
+    coat_color: number;
+    position: string;
+    story: string;
+}
 export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName, catId }) => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -20,59 +39,35 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
         situation: ''
     });
     const [submitting, setSubmitting] = useState(false);
-
-    //猫咪信息（可以从接口获取，这里先用 mock）
-    // const catInfo = {
-    //     name: catName || '月亮',
-    //     avatar: 'https://picsum.photos/200/200?random=1',
-    //     gender: '妹妹',
-    //     age: '2岁',
-    //     neutered: '已绝育',
-    //     vaccinated: '已接种疫苗',
-    //     character: '温顺亲人，喜欢玩耍'
-    // };
-    const [catInfo, setCatInfo] = useState({  // ✅ 改为 state
-        name: catName || '加载中...',
+    const [catInfo, setCatInfo] = useState({
+        name: catName || '',
         avatar: '',
         gender: '',
-        age: '',
-        neutered: '',
-        vaccinated: '',
-        character: ''
+        neutered: ''
     });
-    // ✅ 获取猫咪信息
+    const [loading, setLoading] = useState(true);
+    // 获取猫咪信息
     useEffect(() => {
         const fetchCatDetail = async () => {
             if (!catIdParam) return;
             try {
-                const res = await catService.getCatDetail(catIdParam);
+                const res = await request<ApiResponse<CatDetail>>({
+                    url: `/cat/detail/${catIdParam}`,
+                    method: 'GET',
+                    useToken: true
+                });
                 if (res.code === 200 && res.data) {
                     setCatInfo({
                         name: res.data.name,
                         avatar: res.data.avatar,
                         gender: res.data.gender === 1 ? '弟弟' : '妹妹',
-                        // age: res.data.birth_date ? `${new Date().getFullYear() - new Date(res.data.birth_date).getFullYear()}岁` : '未知',
-                        // neutered: res.data.neutered_status === 1 ? '已绝育' : '未绝育',
-                        // vaccinated: '已接种疫苗',
-                        // character: res.data.story || '温顺亲人'
-                        age: '未知',  // 暂不计算年龄
-                        neutered: '未绝育',  // 默认值
-                        vaccinated: '已接种疫苗',
-                        character: '温顺亲人'
+                        neutered: res.data.neutered_status === 1 ? '已绝育' : '未绝育'
                     });
                 }
             } catch (error) {
                 console.error('获取猫咪信息失败:', error);
-                // 降级使用 mock 数据
-                setCatInfo({
-                    name: catName || '月亮',
-                    avatar: 'https://picsum.photos/200/200?random=1',
-                    gender: '妹妹',
-                    age: '2岁',
-                    neutered: '已绝育',
-                    vaccinated: '已接种疫苗',
-                    character: '温顺亲人，喜欢玩耍'
-                });
+            } finally {
+                setLoading(false);
             }
         };
         fetchCatDetail();
@@ -104,12 +99,23 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
         setSubmitting(true);
 
         try {
-            // 调用领养接口
-            const res = await catService.submitAdopt({
-                cat_id: Number(catIdParam),
-                contact_info: formData.contact,
-                reason: formData.reason,
-                info: formData.situation || undefined
+            // 调用创建猫咪接口
+            const res = await request<ApiResponse>({
+                url: '/cats',
+                method: 'POST',
+                data: {
+                    name: catInfo.name,
+                    gender: catInfo.gender === '弟弟' ? 1 : 0,
+                    neutered_status: catInfo.neutered === '已绝育' ? 1 : 2,
+                    birth_date: "2022-01-01",
+                    arrival_date: "2023-01-01",
+                    state: 1,
+                    coat_color: 1,
+                    position: "待领养",
+                    story: `领养人：${formData.contact}，领养原因：${formData.reason}，家庭情况：${formData.situation || '无'}`,
+                    avatar_key: ""
+                },
+                useToken: true
             });
 
             if (res.code === 200) {
@@ -121,7 +127,7 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
             }
         } catch (error: any) {
             console.error('提交失败:', error);
-            if (error.message?.includes('401') || error.message?.includes('未登录')) {
+            if (error.message?.includes('401')) {
                 alert('请先登录');
                 navigate('/');
             } else {
@@ -131,6 +137,16 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
             setSubmitting(false);
         }
     };
+
+    if (loading) {
+        return (
+            <div className={styles.overlay} onClick={handleBackdropClick}>
+                <div className={styles.modal}>
+                    <div className={styles.loading}>加载中...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.overlay} onClick={handleBackdropClick}>
@@ -222,7 +238,6 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
                             <div className={styles.catTags}>
                                 <span className={styles.tag}>{catInfo.neutered}</span>
                                 <span className={styles.tag}>{catInfo.gender}</span>
-                                <span className={styles.tag}>{catInfo.age}</span>
                             </div>
 
 
