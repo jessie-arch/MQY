@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom"
+import style from '../shared/register/RegitserLoginbackkgroud.module.css'
+import { RegisterBanner } from "../shared/register/RegisterBannel"
+
 //注册页
 function Register() {
     return (
-        <div>
-          <Link to="./home">注册</Link>
+        <div className={style.register}>
+          <RegisterBanner/>
         </div>
     )
 }

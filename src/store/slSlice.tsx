@@ -1,13 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
-//照着写
-// const initialState = {
 
-// }
+const initialState = {
+  message:''
+}
 
-// const couterSlice = createSlice({ 
-//   name: "counter",
-//   initialState,
-//   reducers: { 
-  //这边放action
-//   }
-// })
+const errorSlice = createSlice({
+  name:"error",
+  initialState,
+  reducers:{
+    setError:(state,action)=>{
+    state.message = action.payload;
+    },
+    clearError:(state)=>{
+      state.message = ''
+    }
+  }
+})
+
+export const {setError,clearError} = errorSlice.actions;
+export default errorSlice;

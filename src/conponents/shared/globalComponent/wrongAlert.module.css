@@ -1,0 +1,27 @@
+.alert{
+        position:fixed;
+        top:0%;
+        left:50%;
+        transform:translate(-50%,50%);
+        background-color:var(--theme-color);
+        color:#fff;
+        padding:2.5dvh 5dvh;
+        border-radius:var( --radius);
+        z-index:9999;
+}
+.triangle{
+  position: absolute;
+  top:-7%;
+  left:20%;
+  border-left:10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid var(--theme-color);
+}
+.out{
+    position: absolute;
+    top:6%;
+    left:100%;
+    transform: translatex(-100%);
+    color:white;
+    font-size:1.5dvh;
+}

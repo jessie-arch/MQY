@@ -1,12 +1,10 @@
 import { Link, Outlet } from "react-router-dom"
 import {NavCat} from "../shared/navCat"
-
+import { MbabyInterest } from './babyInterest/mBabyInterestThing'    
+import {AddCat} from './addCat/addCat'
 function Home() {
     return (
-        <div>
-            <NavCat/>
-            <Link to="/user">个人主页</Link>
-            
+        <div style={{width:'100%',minHeight:'100dvh'}}> 
             <Outlet />
         </div>
     )

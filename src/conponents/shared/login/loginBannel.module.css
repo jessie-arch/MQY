@@ -1,0 +1,63 @@
+.loginBanner{
+  width: 40dvh;
+  height: 40dvh;
+  border-radius: var( --radius);
+   background-color: white;
+     border: 2px solid #000000;
+  box-shadow: 5px 5px 5px  rgba(0,0,0,0.3);
+  position:absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap:5%;
+}
+.title{
+    margin-top: 5%;
+}
+.userName{
+  margin-top: 5%;
+    position: relative;
+    left: 0%;
+     border-radius: var( --radius);
+    top:5%;
+    background-color:white;
+    width: 80%;
+    height: 11%;
+     border: 2px solid  #000000;
+     display: flex;
+     align-items: center;
+     span{
+      line-height: 100%;
+       width: 5%;
+       margin-left: 3%;
+     }
+}
+.password{
+  composes:userName;
+  b{
+    position: absolute;
+    left: 90%;
+  }
+}
+.btn{
+   composes:userName;
+  margin-top:5%;
+  display: flex;
+ align-items: center;
+ justify-content: center;
+ font-size:1.5dvh;
+ background-color: var(--theme-color);
+ color:white;
+ box-shadow: 5px 5px 5px  rgba(0,0,0,0.3);
+}
+.btn:hover{
+  box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+   transition: all 0.3s ease-in-out;
+}
+.link{
+  position: relative;
+  left: 20%;
+  margin:2dvh;
+  font-size:1.5dvh;
+  color:blue;
+}
