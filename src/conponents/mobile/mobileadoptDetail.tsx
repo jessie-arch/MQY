@@ -1,12 +1,21 @@
-import { Link, useParams } from "react-router-dom"
-//图鉴加领养内页
-function AdoptDetail() {
+import { useParams, useNavigate } from "react-router-dom"
+
+import { MobileAdoptFormModal } from './MobileAdoptFormModal';
+
+function MobileAdoptDetail() {
     const { id } = useParams();
+    const navigate = useNavigate();
+
+    const handleClose = () => {
+        navigate('/home');
+    };
+
     return (
-        <div>
-            <h1>领养详情页{id}</h1>
-            <Link to="/home">返回主页</Link>
-        </div>
-    )
+        <MobileAdoptFormModal
+            onClose={handleClose}
+            catId={id}
+        />
+    );
 }
-export default AdoptDetail;
+
+export default MobileAdoptDetail;

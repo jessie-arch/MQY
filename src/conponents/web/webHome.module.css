@@ -1,0 +1,539 @@
+.searchinput {
+    font-size: 1.8vh;
+    color: #1e293b;
+    background-color: #e4e4e4;
+    padding: 10px 2vw;
+    width: 50vw;
+    height: 4vh;
+    border-radius: 5vh;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* 清除浏览器默认样式 */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.searchwrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 3px 4px 3px 16px;
+    transition: all 0.2s;
+}
+
+/* 搜索建议面板 */
+.suggestionsPanel {
+    position: absolute;
+    top: 80% !important;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* 建议项 */
+.suggestionItem {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.suggestionItem:hover {
+    background-color: #f5f5f5;
+}
+
+/* 建议文字高亮 */
+.suggestionHighlight {
+    color: var(--theme-color);
+    font-weight: bold;
+}
+
+/* 建议类型标签 */
+.suggestionType {
+    margin-left: 8px;
+    font-size: 12px;
+    color: #999;
+}
+
+
+.searchDog {
+    width: 7vh;
+    height: 7vh;
+    margin-top: 1vh;
+    position: relative;
+    left: 2%;
+}
+
+/* 返回全部按钮容器 */
+.backButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+}
+
+/* 返回全部按钮 */
+.backButton {
+    padding: 6px 16px;
+    background-color: var(--theme-color);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: #e6b458;
+}
+
+.backButton:active {
+    transform: translateY(0);
+}
+
+.chipbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+}
+
+.chiprow {
+    display: flex;
+    gap: 3vw;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5vh 3vh;
+    border: 2px solid #1e293b;
+    border-radius: 4vw;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.chip {
+    background: #ffffff;
+    color: #3D3D3D;
+    padding: 1vh 1vw;
+    font-size: 1.5vw;
+    text-align: center;
+    border: 2px solid #1e293b;
+    border-radius: 3vw;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.1s;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.chip i {
+    font-size: 2vh;
+}
+
+.chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.chip:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.activeChip {
+    color: white !important;
+    background-color: var(--theme-color);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 网格布局 */
+.gridContainer {
+    display: grid;
+    margin-top: 3vh;
+    grid-template-columns: repeat(auto-fill, minmax(14vw, 1fr));
+    gap: 3vh;
+    padding: 0 3vh;
+}
+
+/* 卡片样式 */
+.card {
+    border: 1px solid #eee;
+    border-radius: 3vh;
+    overflow: hidden;
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 图片容器 */
+.imageContainer {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    /* 1:1 正方形比例 */
+    background-color: #f5f5f5;
+}
+
+/* 图片样式 */
+.image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 内容区域 */
+.content {
+    display: flex;
+    flex-direction: column;
+    padding: 1vh 1vw;
+}
+
+.card .content strong {
+    font-size: 1.5vh;
+}
+
+/* 添加头像容器样式 */
+.avatarContainer {
+    width: 2vh;
+    height: 2vh;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    /* 防止头像被压缩 */
+}
+
+/* 添加头像图片样式 */
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* 用户信息 */
+.userInfo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.userName {
+    font-size: 22px;
+    color: #131419;
+    font-weight: 500;
+}
+
+.userInfoText {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 猫咪名字 */
+.catName {
+    font-size: 1.3vh;
+    color: #999;
+}
+
+/* 互动信息 */
+.interaction {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #666;
+    font-size: 14px;
+}
+
+.likeText {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.likeInfo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.likeIcon {
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.likeIcon:hover {
+    transform: scale(1.1);
+}
+
+.likedIcon {
+    color: #ff4d4d !important;
+}
+
+.likeCount {
+    color: #666;
+}
+
+/* 点赞状态标签 */
+.likeStatus {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.likeStatusLiked {
+    composes: likeStatus;
+    background-color: var(--theme-color);
+    color: #333;
+}
+
+.likeStatusUnliked {
+    composes: likeStatus;
+    background-color: #f0f0f0;
+    color: #666;
+}
+
+
+
+/* 加载更多容器 */
+.loadMoreContainer {
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+    margin-top: 20px;
+}
+
+/* 加载更多按钮 */
+.loadMoreButton {
+    padding: 12px 40px;
+    background-color: var(--theme-color);
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loadMoreButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: #e6b458;
+    /* 稍微深一点的主题色 */
+}
+
+.loadMoreButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 当没有更多数据时显示的文字（可选） */
+.noMoreText {
+    text-align: center;
+    color: #999;
+    padding: 20px 0;
+    font-size: 14px;
+}
+
+/* 搜索建议面板样式 */
+.suggestionsPanel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.suggestionItem {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.suggestionItem:hover {
+    background-color: #f5f5f5;
+}
+
+.suggestionHighlight {
+    color: var(--theme-color);
+    font-weight: bold;
+}
+
+.suggestionType {
+    margin-left: 8px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* 空状态样式 */
+.emptyState {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 16px;
+    grid-column: 1 / -1;
+}
+
+
+/* ========== 移动端响应式适配 ========== */
+@media (max-width: 768px) {
+
+    /* 搜索框 */
+    .searchinput {
+        width: 70vw;
+        font-size: 14px;
+        padding: 8px 0;
+    }
+
+    .searchDog {
+        width: 6vh;
+        height: 6vh;
+    }
+
+    .suggestionsPanel {
+        max-height: 250px;
+    }
+
+    .suggestionItem {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .suggestionType {
+        font-size: 10px;
+    }
+
+    /* 分类标签行 */
+    .chiprow {
+        width: 90vw;
+        height: auto;
+        gap: 2vw;
+        padding: 1vh 2vh;
+    }
+
+    .chip {
+        width: 22vw;
+        font-size: 3.5vw;
+        padding: 0.8vh 2vw;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .chip i {
+        font-size: 2vh;
+    }
+
+    .searchResultHeader {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .backToAllBtn {
+        padding: 8px 16px;
+    }
+
+    /* 网格布局：手机显示2列 */
+    .gridContainer {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2vh;
+        padding: 0 2vh;
+    }
+
+    /* 卡片内容字体 */
+    .userName {
+        font-size: 14px;
+    }
+
+    .content strong {
+        font-size: 14px;
+    }
+
+    .likeInfo,
+    .likeStatus {
+        font-size: 12px;
+    }
+
+    /* 加载更多按钮 */
+    .loadMoreButton {
+        padding: 8px 30px;
+        font-size: 14px;
+    }
+
+    .loadMoreContainer {
+        padding: 20px 0;
+    }
+}
+
+/* 小手机 (宽度小于 480px) */
+@media (max-width: 480px) {
+    .chip {
+        font-size: 4vw;
+        padding: 0.6vh 2vw;
+    }
+
+    .userName {
+        font-size: 12px;
+    }
+
+    .content strong {
+        font-size: 12px;
+    }
+
+    .likeInfo,
+    .likeStatus {
+        font-size: 10px;
+    }
+
+    .gridContainer {
+        gap: 1.5vh;
+    }
+}
+
+/* 平板 (769px - 1024px) 显示3列 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .gridContainer {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2.5vh;
+    }
+
+    .chiprow {
+        width: 60vw;
+    }
+
+    .chip {
+        width: 15vw;
+        font-size: 2vw;
+    }
+}

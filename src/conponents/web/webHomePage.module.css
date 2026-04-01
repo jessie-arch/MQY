@@ -1,0 +1,102 @@
+.activeChip {
+    color: white !important;
+    background-color: var(--theme-color);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 覆盖原有的chip悬停效果，避免冲突 */
+.chip:hover {
+    background-color: transparent;
+    color: #1f2a3f;
+    transform: translateY(-2px);
+}
+
+.chip:hover i {
+    color: var(--theme-color);
+}
+
+/* 搜索框包装器 */
+.searchInputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.searchButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.searchDogIcon {
+    width: 6vh;
+    height: 6vh;
+}
+
+.searchClear {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+    font-size: 16px;
+    padding: 0 8px;
+    z-index: 2;
+}
+
+.searchClear:hover {
+    color: #333;
+}
+
+/* 搜索建议面板 */
+.suggestionsPanel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 8px;
+}
+
+.suggestionItem {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestionItem:hover {
+    background-color: #f5f5f5;
+}
+
+.suggestionIcon {
+    color: #999;
+    font-size: 14px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .searchClear {
+        right: 50px;
+    }
+
+    .suggestionItem {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+}

@@ -1,40 +1,25 @@
 import { lazy } from "react"
 import { createBrowserRouter } from "react-router-dom"
 
-const Home = lazy(() => import('../conponents/mobile/mobileHome'));
-const Detail = lazy(() => import('../conponents/mobile/mobileDetail'));
-const AdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'));
-const Login = lazy(() => import('../conponents/mobile/mobileLogin'));
-const Register = lazy(() => import('../conponents/mobile/mobileRegister'));
-const User = lazy(() => import('../conponents/mobile/mobileUser'));
-
+const MobileHome = lazy(() => import('../conponents/mobile/mobileHome'));
+const MobileDetail = lazy(() => import('../conponents/mobile/mobileDetail'));
+const MobileAdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'));
+const MobileLogin = lazy(() => import('../conponents/mobile/mobileLogin'));
+const MobileRegister = lazy(() => import('../conponents/mobile/mobileRegister'));
+const MobileUser = lazy(() => import('../conponents/mobile/mobileUser'));
 const mobileRouter = createBrowserRouter([
   {
     path: "/home",
-    element: <Home />,
+    element: <MobileHome />,
     children: [
-      {
-        path: "detail/:id",
-        element: <Detail />
-      },
-      {
-        path: "adoptDetail/:id",
-        element: <AdoptDetail />
-      }
+      { path: "adoptDetail/:id", element: <MobileAdoptDetail /> }
     ]
   },
-  {
-    path: "/user",
-    element: <User />
-  },
-  {
-    path: "/",
-    element: <Login />
-  },
-  {
-    path: "/register",
-    element: <Register />
-  }
-]);
+  { path: "/home/detail/:id", element: <MobileHome /> },
+  { path: "/", element: <MobileLogin /> },
+  { path: "/register", element: <MobileRegister /> },
+  { path: "/user/profile", element: <MobileUser /> },
+  { path: "*", element: <div>404 - 页面不存在</div> }
+])
 
 export default mobileRouter;

@@ -1,0 +1,231 @@
+/* 遮罩层 */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 模态框 - 底部弹出 */
+.modal {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    padding-top: 5vh;
+    background: #FEFBEC;
+    border-radius: 20px 20px 0 0;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* 关闭按钮 */
+.closeBtn {
+    position: absolute;
+    top: 50px;
+    left: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: var(--theme-color);
+    transform: scale(1.05);
+}
+
+/* 标题 */
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    padding: 20px 20px 0;
+    margin: 0;
+}
+
+/* 猫咪信息 */
+.catInfo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.catAvatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.catAvatarDefault {
+    font-size: 32px;
+}
+
+.catDetails {
+    flex: 1;
+}
+
+.catName {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.catTags {
+    display: flex;
+    gap: 8px;
+}
+
+.tag {
+    font-size: 12px;
+    color: var(--theme-color);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* 表单 */
+.form {
+    padding: 0 20px 30px;
+}
+
+/* 表单组 */
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* 输入框 */
+.input,
+.textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #333;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: var(--theme-color);
+    box-shadow: 0 0 0 3px rgba(255, 193, 69, 0.1);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: #bbb;
+}
+
+/* 按钮组 */
+.buttonGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.cancelBtn,
+.submitBtn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #333;
+    background: #f5f5f5;
+    color: #666;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancelBtn:hover {
+    background: #e8e8e8;
+}
+
+.submitBtn {
+    background: var(--theme-color);
+    color: #333;
+    border: 1px solid #333;
+}
+
+.submitBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.submitBtn:active {
+    transform: translateY(0);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
