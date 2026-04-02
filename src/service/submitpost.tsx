@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import {request} from '../utils/myFetch'
 
 export type MediaCredential = {

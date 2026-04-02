@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './wrongAlert.module.css'
 import { useDispatch,useSelector } from 'react-redux'
 import {clearError} from '../../../store/slSlice'
@@ -6,6 +7,7 @@ import {useRef,useEffect} from 'react'
     const dispatch = useDispatch();
      const errorMsg = useSelector((state:any)=>state.error.message);
     const timeID = useRef<ReturnType<typeof setTimeout> | null>(null);
+    //3000秒后自动关闭
     const errtime = () => {
       if(timeID.current){  clearTimeout(timeID.current)  };
    
@@ -14,6 +16,7 @@ import {useRef,useEffect} from 'react'
       clearTime();
      }, 3000)
     }
+    //清理计时器
     const clearTime = () => {
       if(timeID.current){  
         clearTimeout(timeID.current) ;
@@ -22,7 +25,6 @@ import {useRef,useEffect} from 'react'
     }
   useEffect(() => {
     if(!errorMsg) return;
-      console.log(errorMsg);
     errtime();
     return () => clearTime();
   }, [errorMsg]);

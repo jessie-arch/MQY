@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './addCat.module.css'
 import {staterOptions, coatColorOptions} from '../../shared/data'
 import { useState, useRef } from 'react'
@@ -27,6 +28,7 @@ export function AddCat () {
     avatar_key: '',
   })
 
+  //处理图片提交
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -53,6 +55,7 @@ export function AddCat () {
     imgref.current?.click()
   }
 
+  //处理输入
   const Inputname = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
@@ -103,6 +106,7 @@ export function AddCat () {
     })
   }
 
+  //提交
   const submitImg = async (): Promise<boolean> => {
     try {
       if (!putmedia.file) {

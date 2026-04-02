@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './adoptBannel.module.css'
 import star from '../../../assets/img/star.png'
 import {useState,useEffect,useRef} from 'react'
@@ -66,7 +67,7 @@ export function Adoptbannel ({
           avatar:res.data.avatar
         }))
       } catch (error) {
-       dispatch(setError('加载失败了喵, 请刷新后再试吧'))
+       dispatch(setError(`因为${error}加载失败了喵, 请刷新后再试吧`))
       } finally {
         if (mounted) setLoading(false)
       }
@@ -99,7 +100,7 @@ export function Adoptbannel ({
           await unfollowCat(CatId)
         }
       } catch (error) {
-        dispatch(setError('更新关注状态失败，请稍后再试'))
+        dispatch(setError(`失败，${error}`))
         setDetail(pre => ({
           ...pre,
           is_following: !pre.is_following

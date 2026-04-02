@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import type {selectdatatype} from '../../shared/data'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -45,6 +46,7 @@ export function Select ({ datadetail, initialValue,setShow,setForm: _setForm,fil
     list.scrollTop = initialIndex * ITEM_HEIGHT
   }, [datadetail.length, initialIndex])
 
+  //计算滚动位置
   useEffect(() => {
     const updateSpacer = () => {
       const list = listRef.current
@@ -69,7 +71,7 @@ export function Select ({ datadetail, initialValue,setShow,setForm: _setForm,fil
       }
     }
   }, [])
-
+//关闭
   const handleClose = () => {
     if (isClosing) return
 
@@ -78,7 +80,7 @@ export function Select ({ datadetail, initialValue,setShow,setForm: _setForm,fil
       setShow(false)
     }, 220)
   }
-
+//滚动
   const handleScroll = () => {
     const list = listRef.current
     if (!list || !datadetail.length) return
@@ -94,6 +96,7 @@ export function Select ({ datadetail, initialValue,setShow,setForm: _setForm,fil
       frameRef.current = null
     })
   }
+  //提交
   const submit = () => {
   const selected = datadetail[activeIndex]
   if (!selected) return

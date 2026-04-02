@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './Search.module.css'
 import { useState } from 'react'
 import { SearchMainCat } from '../../../service/submitpost'
@@ -15,6 +16,7 @@ function Search ({ setMainCat,setShowSearch}: {  setMainCat: React.Dispatch<Reac
   const catunfullDate: mainCatType[] = [];
   const [disable,setDisable] = useState<boolean>(false);
 
+  //处理提交
   const HandleSubmit = () => {
     setCatData([]);
     setDisable(true);

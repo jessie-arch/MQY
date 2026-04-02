@@ -1,5 +1,6 @@
-  import styles from './RegistrtBannel.module.css'
-  import { useState,useRef,useEffect } from 'react'
+ //整个文件均由贺艳完成
+ import styles from './RegistrtBannel.module.css'
+  import { useState,useRef } from 'react'
  import {useNavigate} from "react-router-dom"
  import {FetchpreAvator,SubmitForm,SubmitImage} from '../../../service/loginFetch'
  import {getres} from '../../../utils/addSecret'
@@ -46,10 +47,11 @@ import { useDispatch } from 'react-redux'
        processFile(file);
      }
 
-     const processFile = (file:File | null | undefined) => {
+     const processFile = async (file:File | null | undefined) => {
        if(!file){
         return;
        }
+       await getPremark();
        setAvator({
         file,
         loading:true,
@@ -81,15 +83,6 @@ import { useDispatch } from 'react-redux'
       }
     }
 
-    useEffect (()=>{
-      let flag = true;
-      if(!flag) return;
-       getPremark(); 
-      return(()=>{
-        flag = false;
-      })
-    },[])
-    
     //提交图片
      const subImg =() => {
       const file:File | null = avator.file

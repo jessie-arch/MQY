@@ -1,3 +1,4 @@
+//整个文件均由章思雨完成
 import { request } from '../utils/myFetch';
 
 export interface UserInfo {

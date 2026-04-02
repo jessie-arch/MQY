@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './addCat.module.css'
 import {AddCatNameimg} from './addCat1'
 import { useState } from 'react'
@@ -32,7 +33,9 @@ export function AddCat ({ onSubmitted, onCancel }: AddCatProps) {
   story: '',
   avatar_key: '',
 })
+
     const [step,setStep] = useState<number>(1)
+    //点击后进入下一页，绑定在下一步
     const addStep = async () => {
       if(step === 3){
         try {
@@ -47,6 +50,7 @@ export function AddCat ({ onSubmitted, onCancel }: AddCatProps) {
       }
       setStep(preStep => preStep += 1);
     }
+    //点击后进入上一页，绑定在返回键
     const minusStep = () => {
       if(step === 1){
         onCancel?.()

@@ -1,3 +1,4 @@
+//整个文件均由章思雨完成
 import { useState, useEffect, useRef, useCallback } from 'react';
 import style from '../webHome.module.css';
 // 搜索建议词条类型

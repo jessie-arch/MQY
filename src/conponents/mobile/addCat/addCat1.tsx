@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import logoCat from '../../../assets/img/logo.svg'
 import type { SubmitCaimg } from '../../../service/addCatFetch'
 import style from './addCat1.module.css'
@@ -12,6 +13,8 @@ export function AddCatNameimg({ form, setForm,  minusStep, addStep }: AddCatName
   const [preview, setPreview] = useState<string>('')
   const [isUploading, setIsUploading] = useState(false)
   const[putmedia,setPutmedia] = useState<SubmitCaimg>({} as SubmitCaimg);
+
+  //处理提交之后的步骤
   const nextStep = async () => {
     if (isUploading) return
 
@@ -37,20 +40,20 @@ export function AddCatNameimg({ form, setForm,  minusStep, addStep }: AddCatName
   const handClick = () => {
     imgref.current?.click()
   }
-
+//查看是否有文件交到input
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       processFile(file)
     }
   }
-
+//处理文件拖动
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     const file = e.dataTransfer.files[0]
     processFile(file)
   }
-
+//将文件存入状态
   const processFile = (file: File | null | undefined) => {
     if (!file) return
     setPreview(URL.createObjectURL(file))

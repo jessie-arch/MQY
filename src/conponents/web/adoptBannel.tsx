@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from '../web/webRegister.module.css'
 import star from '../../assets/img/star.png'
 import {useState,useEffect,useRef} from 'react'

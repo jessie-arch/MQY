@@ -1,5 +1,4 @@
-import logoCat from '../../assets/img/logo.svg'
-import { useState } from 'react'
+//整个文件均由贺艳完成
 import { setError } from '../../../store/slSlice'
 import { useDispatch } from 'react-redux'
 import style from './addCat2.module.css'
@@ -16,6 +15,7 @@ export function Catgendertnr ({ form, setForm,  minusStep, addStep }: AddCatName
 }
     addStep();
   }
+  //处理选择
   const Select = (name: keyof catData, value: number) => {
     setForm({
       ...form,

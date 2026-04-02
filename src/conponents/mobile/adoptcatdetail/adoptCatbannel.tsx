@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './adoptCatbanel.module.css'
 import star from '../../../assets/img/star.png'
 import {useEffect, useRef, useState} from 'react'
@@ -44,6 +45,7 @@ export function AdoptCat ({
     avatar:''
   })
 
+  //加载数据，加载过程中会先显示一个动画
   useEffect(() => {
     let mounted = true
     setLoading(true);
@@ -76,7 +78,7 @@ export function AdoptCat ({
     return () => {
       mounted = false
     }
-  }, [catId])
+  }, [catId,dispatch])
 
   useEffect(() => {
     if (!followDirty || detail.is_following === null) return
@@ -93,7 +95,7 @@ export function AdoptCat ({
           await unfollowCat(catId)
         }
       } catch (error) {
-        dispatch(setError('更新关注状态失败，请稍后再试'))
+        dispatch(setError(error))
         setDetail(pre => ({
           ...pre,
           is_following: !pre.is_following

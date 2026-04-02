@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from '../shared/register/RegitserLoginbackkgroud.module.css'
 import { RegisterBanner } from "../shared/register/RegisterBannel"
 

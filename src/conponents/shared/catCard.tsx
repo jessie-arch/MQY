@@ -1,3 +1,4 @@
+//整个文件均由章思雨完成
 import type { GalleryCat } from '../../service';
 import { getGenderText, getStateClass, getStateText } from '../web/Home/webHome.utils';
 import style from '../web/webHome.module.css';

@@ -1,3 +1,4 @@
+//整个文件均由章思雨完成
 import type { PostItem } from '../../service';
 import { PLACEHOLDER_IMAGE, PLACEHOLDER_AVATAR } from '../web/Home/webHome.constants';
 import style from '../web/webHome.module.css';

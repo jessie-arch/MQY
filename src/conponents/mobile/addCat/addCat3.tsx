@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import {Select} from './selectCatDetail'
 import style from './addCat3.module.css'
 import type { AddCatNameimgProps } from './addCat'

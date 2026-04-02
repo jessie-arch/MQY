@@ -1,3 +1,4 @@
+//整个文件均由章思雨完成
 import searchDog from '../../assets/img/search.png';
 import { SearchSuggestions } from '../web/Home/webSearch';
 import style from '../web/webHome.module.css';

@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import style from './loginBannel.module.css'
 import {useState, useRef} from 'react'
 import { useNavigate,Link } from 'react-router-dom'; 
@@ -17,10 +18,12 @@ export function LoginBannel () {
        username:'',
        password:''
   })
+  //处理显不显示
   const handleShowFlag = () => {
     const newShowFlag= !showFlag;
         setShowFlag(newShowFlag);
   }
+  //处理输入密码和用户名
    const handleInputpassWord = (e: React.ChangeEvent<HTMLInputElement>) => {
       setLogininForm({
         ...logininForm,

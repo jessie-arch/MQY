@@ -1,3 +1,4 @@
+//整个文件均由贺艳完成
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import {AdoptCat} from '../mobile/adoptcatdetail/adoptCatbannel'
