@@ -1,28 +1,14 @@
-// import { Link } from 'react-router-dom'
-// //登录页
-// function Login() {
-//   return (
-//     <div>
+import style from '../shared/register/RegitserLoginbackkgroud.module.css'
+import { LoginBannel } from '../shared/login/loginBannel';
 
-//       <Link to="/register">没有登录?前往注册</Link>
-//       <div></div>
-//       <Link to="./home">登录</Link>
-//     </div>
-//   )
-// }
-// export default Login;
-// src/components/mobile/mobileLogin.tsx
-import { Link } from 'react-router-dom'
-
-function MobileLogin() {
+//登录页
+function Login() {
+  
   return (
-    <div>
-      111
-      <Link to="/register">没有登录?前往注册</Link>
-      <div></div>
-      <Link to="/home">登录</Link>
+    <div className={style.register}>
+    <LoginBannel/>
     </div>
   )
 }
 
-export default MobileLogin;
+export default Login;

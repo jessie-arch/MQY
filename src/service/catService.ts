@@ -53,11 +53,20 @@ export const catService = {
     },
     // 提交领养申请
     submitAdopt: (params: AdoptParams) => {
+        console.log('[submitAdopt] request params:', params);
         return request<AdoptResponse>({
             url: '/cats/adopt',
             method: 'POST',
             data: params,
             useToken: true
-        });
+        })
+            .then((res) => {
+                console.log('[submitAdopt] response:', res);
+                return res;
+            })
+            .catch((err) => {
+                console.error('[submitAdopt] error:', err);
+                throw err;
+            });
     },
 };

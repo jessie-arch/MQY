@@ -5,27 +5,39 @@ import { useNavigate } from 'react-router-dom';
 interface CatCardProps {
     cat: GalleryCat;
     showAdoptBtn?: boolean;
+    sourcePage?: 'guide' | 'adopt';
 }
 
-export const CatCard: React.FC<CatCardProps> = ({ cat, showAdoptBtn = false }) => {
+export const CatCard: React.FC<CatCardProps> = ({ cat, showAdoptBtn = false, sourcePage }) => {
 
     const navigate = useNavigate();
 
     const handleCardClick = () => {
-        if (showAdoptBtn) {
-            navigate(`/home/adoptDetail/${cat.cat_id}`);
-        } else {
-            // navigate(`/home/catDetail/${cat.cat_id}`);
-        }
+        navigate(`/home/adoptDetail/${cat.cat_id}`, {
+            state: {
+                fromPage: sourcePage,
+                fromScrollY: window.scrollY,
+            },
+        });
     };
 
     const handleAdoptClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
-            navigate(`/home/adoptDetail/${cat.cat_id}`);
+            navigate(`/home/adoptDetail/${cat.cat_id}`, {
+                state: {
+                    fromPage: sourcePage,
+                    fromScrollY: window.scrollY,
+                },
+            });
         } else {
-            navigate(`/home/adoptDetail/${cat.cat_id}`);
+            navigate(`/home/adoptDetail/${cat.cat_id}`, {
+                state: {
+                    fromPage: sourcePage,
+                    fromScrollY: window.scrollY,
+                },
+            });
         }
     };
 
@@ -57,7 +69,9 @@ export const CatCard: React.FC<CatCardProps> = ({ cat, showAdoptBtn = false }) =
                         <span>{cat.position}</span>
                     </span>
                     {showAdoptBtn ? (
-                        <span className={style.likeStatusLiked}>申请领养</span>
+                        <span className={getStateClass(cat.state, style)}>
+                            {getStateText(cat.state)}
+                        </span>
                     ) : (
                         <span className={getStateClass(cat.state, style)}>
                             {getStateText(cat.state)}

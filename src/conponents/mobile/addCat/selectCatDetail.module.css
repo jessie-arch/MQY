@@ -1,0 +1,135 @@
+.overlay{
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.35);
+  z-index: 9998;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.overlayClosing{
+  animation: fadeOut .22s ease-in forwards;
+}
+
+.selectbanel{
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background-color: white;
+  z-index: 9999;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.12);
+  height: 42dvh;
+  min-height: 260px;
+  max-height: 420px;
+  padding: 0 0 env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  overflow: hidden;
+  animation: slideUpIn .24s ease-out;
+}
+
+.selectbanelClosing{
+  animation: slideDownOut .22s ease-in forwards;
+}
+
+@keyframes slideUpIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownOut {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.toolbar{
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.closeBtn{
+  color: var(--re-grey);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.sendBtn{
+  color: var(--theme-color);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.container{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.container::-webkit-scrollbar{
+  display: none;
+}
+
+.item,
+.activeItem{
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  scroll-snap-align: center;
+  transition: all .18s ease;
+}
+
+.item{
+  color: #7a7a7a;
+}
+
+.activeItem{
+  color: #222;
+  font-weight: 600;
+}
+
+.spacer{
+  pointer-events: none;
+}
+
+.centerIndicator{
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: calc(44px + ((100% - 44px) / 2));
+  transform: translateY(-50%);
+  height: 44px;
+  border-top: 1px solid #e9e9e9;
+  border-bottom: 1px solid #e9e9e9;
+  pointer-events: none;
+}

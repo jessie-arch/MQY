@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { postService } from '../../service';
-import type { PostItem } from '../../service';
-import { NavCat } from '../shared/navCat';
+import { postService } from '../../../service';
+import type { PostItem } from '../../../service';
+import { NavCat } from '../../shared/navCat';
 import styles from './mobileDetail.module.css';
 
 function MobileDetail() {

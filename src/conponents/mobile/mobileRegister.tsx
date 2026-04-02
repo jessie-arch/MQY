@@ -1,22 +1,13 @@
-// import { Link } from "react-router-dom"
-// //注册页
-// function Register() {
-//     return (
-//         <div>
-//           <Link to="./home">注册</Link>
-//         </div>
-//     )
-// }
-// export default Register;
-// src/components/mobile/mobileRegister.tsx
-import { Link } from "react-router-dom"
+import style from '../shared/register/RegitserLoginbackkgroud.module.css'
+import { RegisterBanner } from "../shared/register/RegisterBannel"
 
-function MobileRegister() {
+//注册页
+function Register() {
     return (
-        <div>
-            <Link to="/home">注册</Link>
+        <div className={style.register}>
+          <RegisterBanner/>
         </div>
     )
 }
 
-export default MobileRegister;
+export default Register;

@@ -4,27 +4,33 @@ import style from '../web/webHome.module.css';
 import { useNavigate } from 'react-router-dom';
 interface PostCardProps {
     post: PostItem;
-    onLike: (postId: number) => void;
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post }) => {
     const navigate = useNavigate();
+    const firstMedia = post.medias?.[0];
+    const isVideo = firstMedia?.media_type?.toUpperCase() === 'VIDEO';
+    const coverImage = firstMedia?.thumbnail_url || firstMedia?.url;
 
     const handleCardClick = () => {
         navigate(`/home/detail/${post.post_id}`);
     };
 
-    const handleLikeClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onLike(post.post_id);
-    };
     return (
         <div className={style.card} onClick={handleCardClick}>
             {/* 图片区域 */}
             <div className={style.imageContainer}>
-                {post.medias && post.medias.length > 0 && (
+                {isVideo && !firstMedia?.thumbnail_url && firstMedia?.url ? (
+                    <video
+                        src={firstMedia.url}
+                        className={style.image}
+                        muted
+                        playsInline
+                        preload="metadata"
+                    />
+                ) : (
                     <img
-                        src={post.medias[0].thumbnail_url}
+                        src={coverImage || PLACEHOLDER_IMAGE}
                         alt={post.title}
                         className={style.image}
                         onError={(e) => {
@@ -62,23 +68,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
                         <strong className={style.userName}>{post.publisher?.username}</strong>
                         <span className={style.catName}>{post.cat?.name}</span>
                     </div>
-                </div>
-
-                {/* 互动信息 */}
-                <div className={style.interaction}>
-                    <span className={style.likeInfo}>
-                        <i
-                            className={`iconfont icon-aixin ${post.interaction.is_liked ? style.likedIcon : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onLike(post.post_id);
-                            }}
-                        />
-                        <span className={style.likeCount}>{post.interaction.like_count}</span>
-                    </span>
-                    <span className={post.interaction.is_liked ? style.likeStatusLiked : style.likeStatusUnliked}>
-                        {post.interaction.is_liked ? '已点赞' : '点赞'}
-                    </span>
                 </div>
             </div>
         </div>

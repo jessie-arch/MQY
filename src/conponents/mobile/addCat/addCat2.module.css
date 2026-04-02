@@ -1,0 +1,62 @@
+.topbar{
+  width: 100%;
+  height: 20dvh;
+}
+.step{
+  position: absolute;
+  left: 2%;
+  top: 2%;
+  font-size: 3dvh;
+}
+.gender{
+ width: 100%;
+  height: 20dvh;
+}
+.tnrstate{
+  width: 100%;
+  height: 20dvh;
+
+}
+.title{
+   font-size: 2dvh;
+  margin-left: 10%;
+}
+.stateli{
+  width: 30%;
+  height: 40%;
+   background-color:white;
+   border-radius: var(--radius);
+   color: var(--theme-color);
+   border: 1.5px solid var(--theme-color);
+    box-shadow:1px 1px 1px 2px rgba(0,0,0,0.1); 
+    display: flex;
+  justify-content: center;
+  align-items: center;
+ font-size:2dvh;
+ font-weight: bolder;
+}
+.stateul{
+  margin-left: 10%;
+    width: 80%;
+    height: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  gap: 5dvh;
+}
+.liSelect{
+    background-color:var(--theme-color);
+     color: white;
+}
+.submit{
+   margin-left:50%;
+  transform: translateX(-50%);
+  width: 10dvh;
+  height: 5dvh;
+  background-color:var(--theme-color);
+  border-radius: var(--radius);
+  color: white;
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.2); 
+   font-weight: bolder;
+}

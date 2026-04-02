@@ -1,60 +1,46 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoCat from '../../assets/img/logo.svg'
-import { removeToken } from '../../utils/token';
+import logoCat from '../../../assets/img/logo.svg'
+import { removeToken } from '../../../utils/token';
+import { usersService, type UsersInfo } from '../../../service';
 import styles from './mobileUser.module.css';
-const MOCK_USER_INFO = {
-    id: 6,
-    username: "缺乏耐心的咕咕咕",
-    avatar_url: "https://hhr-mqy.oss-cn-beijing.aliyuncs.com/avatars/20260310-2d267bf8220a424b8d3acb83a0dd8ac5.jpg",
-    role: "USER"
-};
-const MOCK_STATISTICS = {
-    user_id: 6,
-    total_likes_received: 0,
-    total_post_count: 3,
-    total_following_count: 5,
-    total_likes_count: 12
-};
+
 function MobileUser() {
     const navigate = useNavigate();
-    // const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-    // const [statistics, setStatistics] = useState<UserStatistics | null>(null);
-    const [loading, setLoading] = useState(false);
-    const userInfo = MOCK_USER_INFO;
-    const statistics = MOCK_STATISTICS;
-    // 获取用户信息和统计数据
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             // 获取用户基本信息
-    //             const userRes = await userService.getUserInfo();
-    //             if (userRes.code === 200 && userRes.data) {
-    //                 setUserInfo(userRes.data);
+    const [userInfo, setUserInfo] = useState<UsersInfo | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    //                 // 获取用户统计数据（如果有统计接口）
-    //                 try {
-    //                     const statsRes = await userService.getUserStatistics(userRes.data.id);
-    //                     if (statsRes.code === 200 && statsRes.data) {
-    //                         setStatistics(statsRes.data);
-    //                     }
-    //                 } catch (statsError) {
-    //                     console.error('获取用户统计数据失败:', statsError);
-    //                 }
-    //             } else {
-    //                 // 未登录，跳转回登录页
-    //                 navigate('/');
-    //             }
-    //         } catch (error) {
-    //             console.error('获取用户信息失败:', error);
-    //             navigate('/');
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
+    useEffect(() => {
+        let mounted = true;
 
-    //     fetchUserData();
-    // }, [navigate]);
+        const fetchUserData = async () => {
+            setLoading(true);
+            try {
+                const userRes = await usersService.getUserInfo();
+                if (userRes.code !== 200 || !userRes.data) {
+                    navigate('/');
+                    return;
+                }
+
+                if (mounted) {
+                    setUserInfo(userRes.data);
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+                navigate('/');
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        void fetchUserData();
+
+        return () => {
+            mounted = false;
+        };
+    }, [navigate]);
 
     // 返回上一页
     const handleBack = () => {
@@ -64,13 +50,7 @@ function MobileUser() {
     // 退出登录
     const handleLogout = () => {
         removeToken();
-        navigate('/');
-    };
-
-    // 编辑资料（预留功能）
-    const handleEditProfile = () => {
-        // TODO: 跳转到编辑资料页
-        console.log('编辑资料');
+        navigate('/', { replace: true });
     };
 
     if (loading) {
@@ -86,9 +66,9 @@ function MobileUser() {
     }
 
     // 获取统计数据，没有则显示 0
-    const postCount = statistics?.total_post_count ?? 0;
-    const followCount = statistics?.total_following_count ?? 0;
-    const likeCount = statistics?.total_likes_count ?? 0;
+    const postCount = userInfo.user_post_count ?? 0;
+    const followCount = userInfo.user_follow_count ?? 0;
+    const likeCount = userInfo.user_like_count ?? 0;
 
     return (
         <div className={styles.container}>
@@ -101,7 +81,7 @@ function MobileUser() {
                     {userInfo.avatar_url ? (
                         <img
                             src={userInfo.avatar_url}
-                            alt={userInfo.username}
+                            alt={userInfo.name}
                             className={styles.avatarImg}
                         />
                     ) : (
@@ -111,8 +91,8 @@ function MobileUser() {
                     )}
                 </div>
                 <div className={styles.userDetails}>
-                    <div className={styles.username}>{userInfo.username}</div>
-                    <div className={styles.userId}>ID: {userInfo.id}</div>
+                    <div className={styles.username}>{userInfo.name}</div>
+                    <div className={styles.userId}>ID: {userInfo.user_id}</div>
                 </div>
                 <button className={styles.logoutBtn} onClick={handleLogout}>
                     退出登录

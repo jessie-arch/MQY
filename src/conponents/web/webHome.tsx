@@ -1,17 +1,15 @@
-import { Outlet } from "react-router-dom"
+import { Link,Outlet } from "react-router-dom"
 import { NavCat } from "../shared/navCat"
 import { PostCard } from '../shared/postCard'
 import { CatCard } from '../shared/catCard'
 import { SearchBar } from '../shared/searchBar'
-import { useLike } from './hooks/useLike'
-import { useSearch } from './webSearch';
+import { useSearch } from './Home/webSearch';
 import { UserAvatar } from "../shared/userAvatar"
-import { PostDetailModal } from './PostDetailModal';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef } from "react"
-import { postService, catService } from '../../service'
+import { postService, catService, userService } from '../../service'
 import type { PostItem, GalleryCat } from '../../service'
-import { request } from "../../utils/myFetch"
+ import BabyThing from "./babyInterset/BabyinterstingThings";
 import style from "./webHome.module.css"
 import pageStyle from "./webHomePage.module.css"
 
@@ -22,10 +20,10 @@ function Home() {
   const [postsLoading, setPostsLoading] = useState(false);
   const [postsNextCursor, setPostsNextCursor] = useState('');
   const [postsHasMore, setPostsHasMore] = useState(true);
-  const { id: detailId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const [showAdddPost,setShowAddPost] = useState<boolean>(false)
+  const [userRole, setUserRole] = useState('')
   const [galleryCats, setGalleryCats] = useState<GalleryCat[]>([]);
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [galleryNextCursor, setGalleryNextCursor] = useState('');
@@ -36,7 +34,20 @@ function Home() {
 
   const adoptCats = galleryCats.filter(cat => cat.state === 1);
 
-  const showDetailModal = location.pathname.includes('/home/detail/');
+  const uniqueCatsById = (cats: GalleryCat[]) => {
+    const map = new Map<number, GalleryCat>();
+    cats.forEach((cat) => {
+      map.set(cat.cat_id, cat);
+    });
+    return Array.from(map.values());
+  };
+
+  const showAddCatModal = location.pathname.includes('/home/addCat');
+  const isHomeRoot = location.pathname === '/home';
+  const restorePage = (location.state as { restorePage?: 'life' | 'guide' | 'adopt'; restoreScrollY?: number } | null)?.restorePage;
+  const restoreScrollY = (location.state as { restorePage?: 'life' | 'guide' | 'adopt'; restoreScrollY?: number } | null)?.restoreScrollY;
+  const shouldRefreshCats = Boolean((location.state as { refreshCats?: boolean } | null)?.refreshCats);
+  const isAdmin = userRole.toUpperCase() === 'ADMIN';
   // 搜索 Hook
   const {
     searchKeyword,
@@ -78,16 +89,13 @@ function Home() {
 
     setIsSearching(false);
   };
-  // 点赞 Hook
-  const { handleLike } = useLike(setPosts, setSearchResults);
-
   // 登录状态检查回调
   const handleLoginCheck = (loggedIn: boolean) => {
     setIsLoggedIn(loggedIn);
   };
   // 加载动态
-  const loadPosts = async (cursor?: string) => {
-    if (postsLoading || !postsHasMore) return;
+  const loadPosts = async (cursor?: string, force = false) => {
+    if (postsLoading || (!postsHasMore && !force)) return;
     setPostsLoading(true);
     try {
       const res = await postService.getPosts(cursor);
@@ -107,6 +115,12 @@ function Home() {
       setPostsLoading(false);
     }
   };
+
+  const refreshPosts = async () => {
+    setPostsHasMore(true);
+    setPostsNextCursor('');
+    await loadPosts(undefined, true);
+  };
   //动态后端搜索
   const searchPosts = async (keyword: string) => {
     setPostsLoading(true);
@@ -125,17 +139,17 @@ function Home() {
     }
   };
   // 加载图鉴
-  const loadGallery = async (cursor?: string) => {
-    if (galleryLoading || !galleryHasMore) return;
+  const loadGallery = async (cursor?: string, force = false) => {
+    if (galleryLoading || (!galleryHasMore && !force)) return;
     setGalleryLoading(true);
     try {
       const res = await catService.getGallery(cursor);
 
       if (res.code === 200 && res.data) {
         if (cursor) {
-          setGalleryCats(prev => [...prev, ...res.data.cats]);
+          setGalleryCats(prev => uniqueCatsById([...prev, ...res.data.cats]));
         } else {
-          setGalleryCats(res.data.cats);
+          setGalleryCats(uniqueCatsById(res.data.cats));
         }
         setGalleryNextCursor(res.data.next_cursor?.toString() || '');
         setGalleryHasMore(res.data.has_more);
@@ -146,13 +160,23 @@ function Home() {
       setGalleryLoading(false);
     }
   };
-  const closeDetailModal = () => {
-    navigate('/home');
-  };
 
   useEffect(() => {
     loadPosts();
     loadGallery();
+
+    const loadUserRole = async () => {
+      try {
+        const res = await userService.getUserInfo();
+        if (res.code === 200 && res.data?.role) {
+          setUserRole(res.data.role);
+        }
+      } catch (error) {
+        console.error('获取用户角色失败:', error);
+      }
+    };
+
+    loadUserRole();
   }, []);
 
   // 无限滚动逻辑...
@@ -169,6 +193,43 @@ function Home() {
     if (postsLoaderRef.current) observer.observe(postsLoaderRef.current);
     return () => observer.disconnect();
   }, [activePage, postsLoading, postsHasMore, postsNextCursor]);
+
+  useEffect(() => {
+    if (!isHomeRoot || !restorePage) return;
+
+    setActivePage(restorePage);
+    if (typeof restoreScrollY === 'number') {
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: restoreScrollY, behavior: 'auto' });
+      });
+    }
+    navigate('/home', { replace: true, state: null });
+  }, [isHomeRoot, restorePage, restoreScrollY, navigate]);
+
+  useEffect(() => {
+    if (!shouldRefreshCats) return;
+
+    const reloadCats = async () => {
+      setGalleryHasMore(true);
+      setGalleryNextCursor('');
+      setGalleryLoading(true);
+      try {
+        const res = await catService.getGallery();
+        if (res.code === 200 && res.data) {
+          setGalleryCats(uniqueCatsById(res.data.cats));
+          setGalleryNextCursor(res.data.next_cursor?.toString() || '');
+          setGalleryHasMore(res.data.has_more);
+        }
+      } catch (error) {
+        console.error('刷新猫咪失败:', error);
+      } finally {
+        setGalleryLoading(false);
+      }
+    };
+
+    void reloadCats();
+    navigate('/home', { replace: true, state: null });
+  }, [shouldRefreshCats, navigate]);
 
   useEffect(() => {
     if (activePage !== 'guide') return;
@@ -202,15 +263,31 @@ function Home() {
     <div className={style.backButtonContainer}>
       <button className={style.backButton} onClick={() => {
         clearSearch();
-        loadPosts;
+        void refreshPosts();
       }}>
         返回全部
       </button>
     </div>
   );
 
+
   return (
-    <div>
+    <div className={style.all}>
+           {/*发表动态 */}
+    
+        {showAdddPost ? (
+          <BabyThing
+            setShowAddPost={setShowAddPost}
+            onSubmitted={() => {
+              void refreshPosts();
+            }}
+          />
+        ) : (
+            <div className={`iconfont icon-jiahao1 ${style.addPost}`} onClick={() => { setShowAddPost(true); }}></div>
+        )}
+        {isAdmin && !showAddCatModal && (
+          <Link to="/home/addCat" className={style.addCatEntry}>添加猫咪</Link>
+        )}
       <NavCat />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -253,12 +330,12 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关动态</div>
-                    : searchResults.map((post) => <PostCard key={post.post_id} post={post} onLike={handleLike} />)}
+                    : searchResults.map((post) => <PostCard key={post.post_id} post={post} />)}
               </>
             ) : (
               <>
                 {posts.length === 0 && !postsLoading ? <div className={style.emptyState}>暂无动态</div>
-                  : posts.map((post) => <PostCard key={post.post_id} post={post} onLike={handleLike} />)}
+                  : posts.map((post) => <PostCard key={post.post_id} post={post} />)}
               </>
             )}
           </div>
@@ -280,12 +357,12 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关猫咪</div>
-                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} />)}
+                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
               </>
             ) : (
               <>
                 {galleryCats.length === 0 && !galleryLoading ? <div className={style.emptyState}>暂无图鉴数据</div>
-                  : galleryCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} />)}
+                  : galleryCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
               </>
             )}
           </div>
@@ -307,12 +384,12 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到待领养猫咪</div>
-                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn />)}
+                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
               </>
             ) : (
               <>
                 {adoptCats.length === 0 && !galleryLoading ? <div className={style.emptyState}>暂无待领养猫咪</div>
-                  : adoptCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn />)}
+                  : adoptCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
               </>
             )}
           </div>
@@ -326,10 +403,6 @@ function Home() {
       )}
 
       <Outlet />
-      {/* 详情弹窗 */}
-      {showDetailModal && (
-        <PostDetailModal onClose={closeDetailModal} />
-      )}
     </div>
   );
 }

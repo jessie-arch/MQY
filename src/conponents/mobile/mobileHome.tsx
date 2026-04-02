@@ -3,16 +3,13 @@ import { NavCat } from "../shared/navCat"
 import { PostCard } from "../shared/postCard"
 import { CatCard } from "../shared/catCard"
 import { SearchBar } from "../shared/searchBar"
-import { useLike } from "../web/hooks/useLike"
-import { useSearch } from "../web/webSearch"
-import { MobilePostDetailModal } from './MobilePostDetailModal'
-
+import { useSearch } from "../web/Home/webSearch"
 import { useEffect, useState, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { userService } from '../../service'
-import { postService, catService } from '../../service'
+import { postService, catService, userService } from '../../service'
 import type { PostItem, GalleryCat } from '../../service'
-
+import {MbabyInterest} from './babyInterest/mBabyInterestThing'
+import { AddCat } from './addCat/addCat'
 import style from "../web/webHome.module.css"
 import pageStyle from "../web/webHomePage.module.css"
 
@@ -20,10 +17,14 @@ function MobileHome() {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const isHomeRoot = location.pathname === '/home';
+    const restorePage = (location.state as { restorePage?: 'life' | 'guide' | 'adopt'; restoreScrollY?: number } | null)?.restorePage;
+    const restoreScrollY = (location.state as { restorePage?: 'life' | 'guide' | 'adopt'; restoreScrollY?: number } | null)?.restoreScrollY;
     const [avatarUrl, setAvatarUrl] = useState<string>('');
 
     const [activePage, setActivePage] = useState('life');
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [userRole, setUserRole] = useState('');
+    const [showAddCat, setShowAddCat] = useState(false);
     const [posts, setPosts] = useState<PostItem[]>([]);
     const [postsLoading, setPostsLoading] = useState(false);
     const [postsNextCursor, setPostsNextCursor] = useState('');
@@ -38,17 +39,13 @@ function MobileHome() {
     const galleryLoaderRef = useRef<HTMLDivElement>(null);
 
     const adoptCats = galleryCats.filter(cat => cat.state === 1);
+    const isAdmin = userRole.toUpperCase() === 'ADMIN';
 
-    // 判断是否显示详情弹窗
-    const showDetailModal = location.pathname.includes('/home/detail/');
-    // 关闭弹窗
-    const closeDetailModal = () => {
-        navigate('/home');
-    };
+    //显示发表动态
+    const [showAddpost,setShowAddpost] = useState<boolean>(false) 
     const {
         searchKeyword,
         searchResults,
-        setSearchResults,
         isSearching,
         showSuggestions,
         suggestions,
@@ -64,12 +61,6 @@ function MobileHome() {
         currentGallery: galleryCats,
         currentAdopt: adoptCats,
     });
-
-    const { handleLike } = useLike(setPosts, setSearchResults);
-
-    const handleLoginCheck = (loggedIn: boolean) => {
-        setIsLoggedIn(loggedIn);
-    };
 
     const loadPosts = async (cursor?: string) => {
         if (postsLoading || !postsHasMore) return;
@@ -112,34 +103,40 @@ function MobileHome() {
             setGalleryLoading(false);
         }
     };
-    // 获取用户头像
-    // useEffect(() => {
-    //     const fetchUserAvatar = async () => {
-    //         try {
-    //             const res = await userService.getUserInfo();
-
-    //             console.log('移动端获取用户信息:', res);
-    //             console.log('头像URL:', res.data.avatar_url);
-    //             if (res.code === 200 && res.data) {
-    //                 setAvatarUrl(res.data.avatar_url);
-    //             }
-    //         } catch (error) {
-    //             console.error('获取用户信息失败:', error);
-    //         }
-    //     };
-    //     fetchUserAvatar();
-    // }, []);
-    useEffect(() => {
-        setAvatarUrl("https://hhr-mqy.oss-cn-beijing.aliyuncs.com/avatars/20260310-2d267bf8220a424b8d3acb83a0dd8ac5.jpg");
-    }, []);
+ 
     const handleAvatarClick = () => {
-        console.log('点击头像，准备跳转到 /user/profile');
-        navigate('/user/profile');
+        navigate('/user');
     };
     useEffect(() => {
         loadPosts();
         loadGallery();
+
+        const loadUserRole = async () => {
+            try {
+                const res = await userService.getUserInfo();
+                if (res.code === 200 && res.data) {
+                    setUserRole(res.data.role);
+                    setAvatarUrl(res.data.avatar_url);
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+            }
+        };
+
+        void loadUserRole();
     }, []);
+
+    useEffect(() => {
+        if (!isHomeRoot || !restorePage) return;
+
+        setActivePage(restorePage);
+        if (typeof restoreScrollY === 'number') {
+            window.requestAnimationFrame(() => {
+                window.scrollTo({ top: restoreScrollY, behavior: 'auto' });
+            });
+        }
+        navigate('/home', { replace: true, state: null });
+    }, [isHomeRoot, restorePage, restoreScrollY, navigate]);
 
     useEffect(() => {
         if (activePage !== 'life') return;
@@ -191,13 +188,33 @@ function MobileHome() {
     );
 
     return (
-        <div>
+        <div className={style.all}>
+            {isAdmin && showAddCat && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 1200, background: 'rgba(0,0,0,0.45)' }}>
+                    <AddCat onSubmitted={() => setShowAddCat(false)} onCancel={() => setShowAddCat(false)} />
+                </div>
+            )}
+              {/*发表动态 */}
+        {showAddpost ? (
+            <MbabyInterest      showAddpost={showAddpost}setShowAddpost={setShowAddpost} />
+        ) : (
+            <div className={`iconfont icon-jiahao1 ${style.maddPost}`} onClick={() => { setShowAddpost(true); }}></div>
+        )}
+            {isAdmin && !showAddCat && (
+                <button
+                    type="button"
+                    onClick={() => setShowAddCat(true)}
+                    style={{ position: 'fixed', right: '5vw', top: '73vh', zIndex: 1100, padding: '8px 12px', borderRadius: 20, background: 'var(--theme-color)', color: '#fff', fontSize: 13, fontWeight: 600 }}
+                >
+                    添加猫咪
+                </button>
+            )}
             <NavCat
                 showAvatar={true}
                 avatarUrl={avatarUrl}
                 onAvatarClick={handleAvatarClick}
             />
-
+      
             {/* 搜索栏 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px' }}>
                 <div style={{ flex: 1 }}>
@@ -239,12 +256,12 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关动态</div>
-                                            : searchResults.map((post) => <PostCard key={post.post_id} post={post} onLike={handleLike} />)}
+                                            : searchResults.map((post) => <PostCard key={post.post_id} post={post} />)}
                                 </>
                             ) : (
                                 <>
                                     {posts.length === 0 && !postsLoading ? <div className={style.emptyState}>暂无动态</div>
-                                        : posts.map((post) => <PostCard key={post.post_id} post={post} onLike={handleLike} />)}
+                                        : posts.map((post) => <PostCard key={post.post_id} post={post} />)}
                                 </>
                             )}
                         </div>
@@ -266,12 +283,12 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关猫咪</div>
-                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} />)}
+                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
                                 </>
                             ) : (
                                 <>
                                     {galleryCats.length === 0 && !galleryLoading ? <div className={style.emptyState}>暂无图鉴数据</div>
-                                        : galleryCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} />)}
+                                        : galleryCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
                                 </>
                             )}
                         </div>
@@ -293,12 +310,12 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到待领养猫咪</div>
-                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn />)}
+                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
                                 </>
                             ) : (
                                 <>
                                     {adoptCats.length === 0 && !galleryLoading ? <div className={style.emptyState}>暂无待领养猫咪</div>
-                                        : adoptCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn />)}
+                                        : adoptCats.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
                                 </>
                             )}
                         </div>

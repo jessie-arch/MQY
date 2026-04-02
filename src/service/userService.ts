@@ -1,5 +1,5 @@
 import { request } from '../utils/myFetch';
-import { getToken, setToken, removeToken } from '../utils/token';
+import { getToken,  removeToken } from '../utils/token';
 
 export interface UserInfo {
     id: number;

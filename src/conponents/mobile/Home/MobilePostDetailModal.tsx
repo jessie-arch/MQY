@@ -1,80 +1,113 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { PostItem } from '../../service';
-import { NavCat } from '../shared/navCat';
+import { postService, type PostDetailItem } from '../../../service/postService';
 import styles from './MobilePostDetailModal.module.css';
 
 interface MobilePostDetailModalProps {
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ onClose }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [post, setPost] = useState<PostItem | null>(null);
+    const [post, setPost] = useState<PostDetailItem | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isFollowing, setIsFollowing] = useState(false);
+    const [liking, setLiking] = useState(false);
 
     useEffect(() => {
-        // const fetchDetail = async () => {
-        //     if (!id) return;
-        //     try {
-        //         const res = await postService.getPostDetail(id);
-        //         if (res.code === 200 && res.data) {
-        //             setPost(res.data);
-        //         }
-        //     } catch (error) {
-        //         console.error('加载详情失败:', error);
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // };
-        // fetchDetail();
-        setTimeout(() => {
-            const mockData: PostItem = {
-                post_id: Number(id),
-                title: "好长的腿",
-                content: "今天带猫咪去公园散步，它好开心啊！腿真的好长，跑起来像一阵风~ 看着它在草地上奔跑的样子，感觉所有的烦恼都没有了。猫咪真的太治愈了！",
-                create_time: new Date().toISOString(),
-                publisher: {
-                    user_id: 1,
-                    username: "吃鱼的猫~",
-                    avatar_url: "https://hhr-mqy.oss-cn-beijing.aliyuncs.com/avatars/20260310-2d267bf8220a424b8d3acb83a0dd8ac5.jpg"
-                },
-                cat: {
-                    cat_id: 1,
-                    name: "月亮",
-                    avater: ""  // 注意拼写是 avater
-                },
-                medias: [
-                    {
-                        media_type: "IMAGE",
-                        url: "https://picsum.photos/800/600?random=1",
-                        thumbnail_url: "https://picsum.photos/400/300?random=1",
-                        width: 800,
-                        height: 600
-                    }
-                ],
-                interaction: {
-                    like_count: 42,
-                    is_liked: false
+        let mounted = true;
+
+        const fetchDetail = async () => {
+            if (!id) {
+                if (mounted) setLoading(false);
+                return;
+            }
+
+            try {
+                const res = await postService.getPostDetail(id);
+                if (mounted && res.code === 200 && res.data) {
+                    setPost(res.data);
                 }
-            };
-            setPost(mockData);
-            setLoading(false);
-        }, 300);
+            } catch (error) {
+                console.error('加载详情失败:', error);
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+
+        void fetchDetail();
+
+        return () => {
+            mounted = false;
+        };
     }, [id]);
+
+    const handleClose = () => {
+        onClose?.();
+        navigate('/home');
+    };
 
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
-            onClose();
-            navigate('/home');
+            handleClose();
         }
     };
 
-    const handleFollow = () => {
-        setIsFollowing(!isFollowing);
-        // TODO: 调用关注接口
+    const authorName = post?.author?.username || '未知用户';
+    const authorAvatar = post?.author?.avatar_url || '';
+    const likeCount = post?.stats?.like_count ?? 0;
+    const isLiked = Boolean(post?.stats?.is_liked);
+    const firstVideoMedia = post?.medias?.find(media => media?.media_type?.toUpperCase() === 'VIDEO');
+    const firstMedia = firstVideoMedia || post?.medias?.[0];
+    const isVideo = firstMedia?.media_type?.toUpperCase() === 'VIDEO';
+    const mediaSource = firstMedia?.url || firstMedia?.thumbnail_url || '';
+    const videoMimeType = (() => {
+        if (/\.webm(\?|$)/i.test(mediaSource)) return 'video/webm';
+        if (/\.ogg(\?|$)/i.test(mediaSource)) return 'video/ogg';
+        return 'video/mp4';
+    })();
+
+    const handleLike = async () => {
+        if (!post || liking) return;
+
+        const previousStats = post.stats;
+        const nextIsLiked = !previousStats?.is_liked;
+        setLiking(true);
+        setPost(prev => (
+            prev
+                ? {
+                    ...prev,
+                    stats: {
+                        is_liked: nextIsLiked,
+                        like_count: nextIsLiked
+                            ? (prev.stats?.like_count ?? 0) + 1
+                            : Math.max((prev.stats?.like_count ?? 0) - 1, 0),
+                    },
+                }
+                : prev
+        ));
+
+        try {
+            const res = previousStats?.is_liked 
+                ? await postService.unlikePost(post.post_id)
+                : await postService.likePost(post.post_id);
+            if (res.code !== 200) {
+                throw new Error(res.msg || '操作失败');
+            }
+        } catch (error) {
+            console.error('点赞失败:', error);
+            setPost(prev => (
+                prev
+                    ? {
+                        ...prev,
+                        stats: previousStats,
+                    }
+                    : prev
+            ));
+        } finally {
+            setLiking(false);
+        }
     };
 
     const formatDate = (dateStr: string) => {
@@ -83,32 +116,42 @@ export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ on
     };
 
     if (loading) {
-        return (
+        const loadingView = (
             <div className={styles.overlay} onClick={handleBackdropClick}>
                 <div className={styles.modal}>
                     <div className={styles.loading}>加载中...</div>
                 </div>
             </div>
         );
+
+        if (typeof document === 'undefined') {
+            return loadingView;
+        }
+
+        return createPortal(loadingView, document.body);
     }
 
     if (!post) {
-        return (
+        const errorView = (
             <div className={styles.overlay} onClick={handleBackdropClick}>
                 <div className={styles.modal}>
                     <div className={styles.error}>加载失败</div>
                 </div>
             </div>
         );
+
+        if (typeof document === 'undefined') {
+            return errorView;
+        }
+
+        return createPortal(errorView, document.body);
     }
 
-    return (
+    const detailView = (
         <div className={styles.overlay} onClick={handleBackdropClick}>
             <div className={styles.modal}>
-                {/* 顶部导航栏 */}
                 <div className={styles.navBar}>
-                    <NavCat />
-                    <button className={styles.closeBtn} onClick={onClose}>
+                    <button className={styles.closeBtn} onClick={handleClose}>
                         ×
                     </button>
                 </div>
@@ -117,12 +160,25 @@ export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ on
                 <div className={styles.scrollContent}>
                     {/* 图片区域 */}
                     <div className={styles.imageSection}>
-                        {post.medias && post.medias.length > 0 ? (
-                            <img
-                                src={post.medias[0].url}
-                                alt={post.title}
-                                className={styles.mainImage}
-                            />
+                        {mediaSource ? (
+                            isVideo ? (
+                                <video
+                                    controls
+                                    preload="metadata"
+                                    playsInline
+                                    poster={firstMedia?.thumbnail_url || firstMedia?.url}
+                                    className={styles.mainImage}
+                                >
+                                    <source src={mediaSource} type={videoMimeType} />
+                                    你的浏览器不支持视频播放。
+                                </video>
+                            ) : (
+                                <img
+                                    src={mediaSource}
+                                    alt={post.title}
+                                    className={styles.mainImage}
+                                />
+                            )
                         ) : (
                             <div className={styles.noImage}>暂无图片</div>
                         )}
@@ -133,33 +189,26 @@ export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ on
                         {/* 用户信息 */}
                         <div className={styles.userInfo}>
                             <div className={styles.avatarWrapper}>
-                                {post.publisher?.avatar_url ? (
+                                {authorAvatar ? (
                                     <img
-                                        src={post.publisher.avatar_url}
-                                        alt={post.publisher.username}
+                                        src={authorAvatar}
+                                        alt={authorName}
                                         className={styles.avatar}
                                     />
                                 ) : (
                                     <div className={styles.avatarDefault}>
-                                        {post.publisher?.username?.charAt(0) || '?'}
+                                        {authorName?.charAt(0) || '?'}
                                     </div>
                                 )}
                             </div>
                             <div className={styles.userDetails}>
                                 <div className={styles.userName}>
-                                    {post.publisher?.username}
-                                    <span className={styles.userId}>· {post.publisher?.user_id}</span>
+                                    {authorName}
                                 </div>
                                 <div className={styles.postTime}>
                                     {formatDate(post.create_time)}
                                 </div>
                             </div>
-                            <button
-                                className={`${styles.followBtn} ${isFollowing ? styles.following : ''}`}
-                                onClick={handleFollow}
-                            >
-                                {isFollowing ? '已关注' : '+关注'}
-                            </button>
                         </div>
 
                         {/* 猫咪标签 */}
@@ -176,17 +225,9 @@ export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ on
 
                         {/* 互动区域 */}
                         <div className={styles.interaction}>
-                            <div className={styles.likeInfo}>
-                                <i className={`iconfont icon-aixin ${post.interaction.is_liked ? styles.liked : ''}`} />
-                                <span>{post.interaction.like_count}</span>
-                            </div>
-                            <div className={styles.commentInfo}>
-                                <i className="iconfont icon-pinglun" />
-                                <span>评论</span>
-                            </div>
-                            <div className={styles.collectInfo}>
-                                <i className="iconfont icon-shoucang" />
-                                <span>收藏猫咪</span>
+                            <div className={styles.likeInfo} onClick={handleLike} style={{ cursor: liking ? 'wait' : 'pointer' }}>
+                                <i className={`iconfont icon-aixin ${isLiked ? styles.liked : ''}`} />
+                                <span>{likeCount}</span>
                             </div>
                         </div>
                     </div>
@@ -194,4 +235,12 @@ export const MobilePostDetailModal: React.FC<MobilePostDetailModalProps> = ({ on
             </div>
         </div>
     );
+
+    if (typeof document === 'undefined') {
+        return detailView;
+    }
+
+    return createPortal(detailView, document.body);
 };
+
+export default MobilePostDetailModal;

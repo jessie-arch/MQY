@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
-import { request } from '../../../utils/myFetch';
+import { catService } from '../../../service';
+import { FetchpreCatdetail } from '../../../service/adoptCat';
+import { useDispatch } from 'react-redux';
+import { setError } from '../../../store/slSlice';
 import styles from './MobileAdoptFormModal.module.css';
 
 interface MobileAdoptFormModalProps {
@@ -10,6 +14,7 @@ interface MobileAdoptFormModalProps {
 }
 
 export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onClose, catName, catId }) => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
     const catIdParam = catId || id;
@@ -21,7 +26,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
     });
     const [submitting, setSubmitting] = useState(false);
     const [catInfo, setCatInfo] = useState({
-        name: catName || '月亮',
+        name: catName || '',
         avatar: '',
         gender: '',
         neutered: ''
@@ -32,11 +37,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
         const fetchCatDetail = async () => {
             if (!catIdParam) return;
             try {
-                const res = await request<any>({
-                    url: `/cat/detail/${catIdParam}`,
-                    method: 'GET',
-                    useToken: true
-                });
+                const res = await FetchpreCatdetail(Number(catIdParam));
                 if (res.code === 200 && res.data) {
                     setCatInfo({
                         name: res.data.name,
@@ -50,7 +51,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
             }
         };
         fetchCatDetail();
-    }, [catIdParam]);
+    }, [catIdParam, catName]);
 
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
@@ -68,49 +69,42 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
         e.preventDefault();
 
         if (!formData.contact.trim()) {
-            alert('请填写联系方式');
+            dispatch(setError('请填写联系方式'));
             return;
         }
         if (!formData.reason.trim()) {
-            alert('请填写领养原因');
+            dispatch(setError('请填写领养原因'));
+            return;
+        }
+        if (!catIdParam) {
+            dispatch(setError('猫咪信息异常，请返回重试'));
             return;
         }
 
         setSubmitting(true);
 
         try {
-            const res = await request<any>({
-                url: '/cats',
-                method: 'POST',
-                data: {
-                    name: catInfo.name,
-                    gender: catInfo.gender === '弟弟' ? 1 : 0,
-                    neutered_status: catInfo.neutered === '已绝育' ? 1 : 2,
-                    birth_date: "2022-01-01",
-                    arrival_date: "2023-01-01",
-                    state: 1,
-                    coat_color: 1,
-                    position: "待领养",
-                    story: `领养人：${formData.contact}，领养原因：${formData.reason}，家庭情况：${formData.situation || '无'}`,
-                    avatar_key: ""
-                },
-                useToken: true
+            const res = await catService.submitAdopt({
+                cat_id: Number(catIdParam),
+                contact_info: formData.contact.trim(),
+                reason: formData.reason.trim(),
+                info: formData.situation.trim() || undefined,
             });;
 
             if (res.code === 200) {
-                alert('提交成功！我们会尽快联系您');
+                dispatch(setError('提交成功！我们会尽快联系您'));
                 onClose();
                 navigate('/home');
             } else {
-                alert(res.msg || '提交失败，请稍后重试');
+                dispatch(setError(res.msg || '提交失败，请稍后重试'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('提交失败:', error);
-            if (error.message?.includes('401')) {
-                alert('请先登录');
+            if (error instanceof Error && error.message?.includes('401')) {
+                dispatch(setError('请先登录'));
                 navigate('/');
             } else {
-                alert('提交失败，请稍后重试');
+                dispatch(setError(error instanceof Error ? error.message : '提交失败，请稍后重试'));
             }
         } finally {
             setSubmitting(false);
@@ -118,7 +112,7 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
     };
 
 
-    return (
+    const modalView = (
         <div className={styles.overlay} onClick={handleBackdropClick}>
             <div className={styles.modal}>
                 {/* 关闭按钮 */}
@@ -140,10 +134,6 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
                     </div>
                     <div className={styles.catDetails}>
                         <div className={styles.catName}>{catInfo.name}</div>
-                        <div className={styles.catTags}>
-                            <span className={styles.tag}>{catInfo.neutered}</span>
-                            <span className={styles.tag}>{catInfo.gender}</span>
-                        </div>
                     </div>
                 </div>
 
@@ -203,4 +193,10 @@ export const MobileAdoptFormModal: React.FC<MobileAdoptFormModalProps> = ({ onCl
             </div>
         </div>
     );
+
+    if (typeof document === 'undefined') {
+        return modalView;
+    }
+
+    return createPortal(modalView, document.body);
 };

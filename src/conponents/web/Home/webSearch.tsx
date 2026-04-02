@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import style from './webHome.module.css';
+import style from '../webHome.module.css';
 // 搜索建议词条类型
 interface SearchSuggestion {
     id: string | number;
@@ -87,6 +87,14 @@ export const useSearch = ({
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
+    const uniqueCatsById = useCallback((cats: any[]) => {
+        const map = new Map<number, any>();
+        cats.forEach((cat) => {
+            map.set(cat.cat_id, cat);
+        });
+        return Array.from(map.values());
+    }, []);
+
     // 获取搜索建议
     const fetchSuggestions = useCallback((keyword: string) => {
         if (!keyword.trim()) {
@@ -112,7 +120,7 @@ export const useSearch = ({
             const matchedCats = currentGallery.filter((cat) =>
                 cat.name?.toLowerCase().includes(keyword.toLowerCase())
             );
-            suggestionsList = matchedCats.slice(0, 5).map((cat) => ({
+            suggestionsList = uniqueCatsById(matchedCats).slice(0, 5).map((cat) => ({
                 id: cat.cat_id,
                 name: cat.name,
                 type: '猫咪',
@@ -121,7 +129,7 @@ export const useSearch = ({
             const matchedCats = currentAdopt.filter((cat) =>
                 cat.name?.toLowerCase().includes(keyword.toLowerCase())
             );
-            suggestionsList = matchedCats.slice(0, 5).map((cat) => ({
+            suggestionsList = uniqueCatsById(matchedCats).slice(0, 5).map((cat) => ({
                 id: cat.cat_id,
                 name: cat.name,
                 type: '待领养猫咪',
@@ -170,21 +178,21 @@ export const useSearch = ({
                         post.publisher?.username?.toLowerCase().includes(keyword.toLowerCase())
                 );
             } else if (activePage === 'guide') {
-                results = currentGallery.filter(
+                results = uniqueCatsById(currentGallery.filter(
                     (cat) =>
                         cat.name?.toLowerCase().includes(keyword.toLowerCase())
-                );
+                ));
             } else if (activePage === 'adopt') {
-                results = currentAdopt.filter(
+                results = uniqueCatsById(currentAdopt.filter(
                     (cat) =>
                         cat.name?.toLowerCase().includes(keyword.toLowerCase())
-                );
+                ));
             }
 
             setSearchResults(results);
             setIsSearching(false);
         },
-        [activePage, currentPosts, currentGallery, currentAdopt]
+        [activePage, currentPosts, currentGallery, currentAdopt, uniqueCatsById]
     );
 
     // 清除搜索

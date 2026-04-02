@@ -1,25 +1,47 @@
-import { lazy } from "react"
-import { createBrowserRouter } from "react-router-dom"
+import { lazy} from "react"
+import { createBrowserRouter, Navigate } from "react-router-dom"
+import { getToken } from '.././utils/token';
+const Home = lazy(() => import('../conponents/mobile/mobileHome'));
+const Detail = lazy(() => import('../conponents/mobile/Home/MobilePostDetailModal'));
+const AdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'));
+const Login = lazy(() => import('../conponents/mobile/mobileLogin'));
+const Register = lazy(() => import('../conponents/mobile/mobileRegister'));
+const User = lazy(() => import('../conponents/mobile/user/mobileUser'));
+import Layout from '../conponents/shared/globalComponent/layOut'
+import Guard from "./Guard";
 
-const MobileHome = lazy(() => import('../conponents/mobile/Home/mobileHome'));
-const MobileDetail = lazy(() => import('../conponents/mobile/Home/mobileDetail'));
-const MobileAdoptDetail = lazy(() => import('../conponents/mobile/Home/mobileadoptDetail'));
-const MobileLogin = lazy(() => import('../conponents/mobile/mobileLogin'));
-const MobileRegister = lazy(() => import('../conponents/mobile/mobileRegister'));
-const MobileUser = lazy(() => import('../conponents/mobile/Home/mobileUser'));
 const mobileRouter = createBrowserRouter([
   {
-    path: "/home",
-    element: <MobileHome />,
+    element: <Layout />,
     children: [
-      { path: "adoptDetail/:id", element: <MobileAdoptDetail /> }
+      {
+        path: "/",
+        element: getToken() ? <Navigate to="/home" /> : <Login />
+      },
+      {
+        path: "/register",
+        element: <Register />
+      },
+      {
+        path: "/home",
+        element: <Guard><Home /></Guard>,
+        children: [
+          {
+            path: "detail/:id",
+            element: <Guard><Detail /></Guard>
+          },
+          {
+            path: "adoptDetail/:id",
+            element: <Guard><AdoptDetail /></Guard>
+          }
+        ]
+      },
+      {
+        path: "/user",
+        element: <Guard><User /></Guard>
+      }
     ]
-  },
-  { path: "/home/detail/:id", element: <MobileHome /> },
-  { path: "/", element: <MobileLogin /> },
-  { path: "/register", element: <MobileRegister /> },
-  { path: "/user/profile", element: <MobileUser /> },
-  { path: "*", element: <div>404 - 页面不存在</div> }
+  }
 ])
 
 export default mobileRouter;

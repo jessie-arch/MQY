@@ -1,0 +1,11 @@
+.register{
+ background:var(--bg-color);
+ width: 100vw;
+ min-height: 100dvh;
+ display:flex;
+ align-items: center;
+ justify-content: center;
+ overflow: hidden;
+ padding: 16px;
+ box-sizing: border-box;
+}

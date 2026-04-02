@@ -1,32 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userService, type UserInfo, type UserStatistics } from '../../service/userService';
+import { usersService, type UserInfo } from '../../service/usersService';
 import { removeToken } from '../../utils/token';
 import style from './userAvatar.module.css';
 
 interface UserAvatarProps {
     onLoginCheck?: (isLoggedIn: boolean) => void;
 }
-interface UserInfoFull {
-    user_id: number;
-    name: string;
-    avatar_url: string;
-    role: string;
-    user_follow_count: number;
-    user_like_count: number;
-    user_like_received: number;
-    user_post_count: number;
-}
-const MOCK_USER: UserInfoFull = {
-    avatar_url: "https://hhr-mqy.oss-cn-beijing.aliyuncs.com/avatars/20260310-2d267bf8220a424b8d3acb83a0dd8ac5.jpg",
-    name: "dddd",
-    role: "USER",
-    user_follow_count: 0,
-    user_id: 6,
-    user_like_count: 1,
-    user_like_received: 0,
-    user_post_count: 0
-};
 
 export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -34,47 +14,28 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
     const [loading, setLoading] = useState(true);
     const panelRef = useRef<HTMLDivElement>(null);
     const avatarRef = useRef<HTMLDivElement>(null);
-    const [statistics, setStatistics] = useState<UserStatistics | null>(null);
 
     const navigate = useNavigate();
 
     const fetchUserInfo = async () => {
         setLoading(true);
-
-        // 直接设置假数据，不请求后端
-        setTimeout(() => {
-            setUserInfo(MOCK_USER as any);
+        try {
+            const res = await usersService.getUserInfo();
+            if (res.code === 200 && res.data) {
+                setUserInfo(res.data);
+                onLoginCheck?.(true);
+            } else {
+                setUserInfo(null);
+                onLoginCheck?.(false);
+            }
+        } catch (error) {
+            console.error('获取用户信息失败:', error);
+            setUserInfo(null);
+            onLoginCheck?.(false);
+        } finally {
             setLoading(false);
-            onLoginCheck?.(true);
-        }, 100);
+        }
     };
-    // 获取用户信息
-    // const fetchUserInfo = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const res = await userService.getUserInfo();
-    //         if (res.code === 200 && res.data) {
-    //             setUserInfo(res.data);
-    //             onLoginCheck?.(true);
-    //             const statsRes = await userService.getUserStatistics(res.data.id);
-    //             if (statsRes.code === 200 && statsRes.data) {
-    //             setStatistics(statsRes.data);
-    //             }
-    //         } else {
-    //             // token 无效，清除并跳转登录
-    //             // removeToken();
-    //             // onLoginCheck?.(false);
-    //             // navigate('/');
-    //         }
-    //     } catch (error) {
-    //         console.error('获取用户信息失败:', error);
-    //         // removeToken();
-    //         // onLoginCheck?.(false);
-    //         // navigate('/');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     // 组件加载时检查登录状态
     useEffect(() => {
@@ -103,20 +64,11 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
         setUserInfo(null);
         setShowPanel(false);
         onLoginCheck?.(false);
-        navigate('/');
-    };
-
-    // 跳转到个人主页
-    const handleGoProfile = () => {
-        setShowPanel(false);
+        navigate('/', { replace: true });
     };
 
     if (loading) {
-        return (
-            <div className={style.avatarWrapper}>
-                <div className={style.avatarPlaceholder}></div>
-            </div>
-        );
+        return null;
     }
 
     if (!userInfo) {
@@ -134,7 +86,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
                 {userInfo.avatar_url ? (
                     <img
                         src={userInfo.avatar_url}
-                        alt={userInfo.username}
+                        alt={userInfo.name}
                         className={style.avatarImg}
                         onError={(e) => {
                             (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="1.5"%3E%3Ccircle cx="12" cy="8" r="4"%3E%3C/circle%3E%3Cpath d="M5 20v-2a7 7 0 0 1 14 0v2"%3E%3C/path%3E%3C/svg%3E';
@@ -142,7 +94,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
                     />
                 ) : (
                     <div className={style.avatarDefault}>
-                        {userInfo.username?.charAt(0).toUpperCase() || 'U'}
+                        {userInfo.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                 )}
             </div>
@@ -154,29 +106,29 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({ onLoginCheck }) => {
                     <div className={style.userInfoSection}>
                         <div className={style.panelAvatar}>
                             {userInfo.avatar_url ? (
-                                <img src={userInfo.avatar_url} alt={userInfo.username} />
+                                <img src={userInfo.avatar_url} alt={userInfo.name} />
                             ) : (
                                 <div className={style.panelAvatarDefault}>
-                                    {userInfo.username?.charAt(0).toUpperCase() || 'U'}
+                                    {userInfo.name?.charAt(0).toUpperCase() || 'U'}
                                 </div>
                             )}
                         </div>
-                        <div className={style.userName}>{userInfo.username}</div>
+                        <div className={style.userName}>{userInfo.name}</div>
                         <div className={style.userRole}>{userInfo.role === 'USER' ? '普通用户' : '管理员'}</div>
                     </div>
 
                     {/* 统计数据 */}
                     <div className={style.statsSection}>
                         <div className={style.statItem}>
-                            <span className={style.statValue}>{statistics?.total_post_count ?? 0}</span>
+                            <span className={style.statValue}>{userInfo.user_post_count ?? 0}</span>
                             <span className={style.statLabel}>动态</span>
                         </div>
                         <div className={style.statItem}>
-                            <span className={style.statValue}>{statistics?.total_following_count ?? 0}</span>
+                            <span className={style.statValue}>{userInfo.user_follow_count ?? 0}</span>
                             <span className={style.statLabel}>关注</span>
                         </div>
                         <div className={style.statItem}>
-                            <span className={style.statValue}>{statistics?.total_likes_count ?? 0}</span>
+                            <span className={style.statValue}>{userInfo.user_like_count ?? 0}</span>
                             <span className={style.statLabel}>获赞</span>
                         </div>
                     </div>

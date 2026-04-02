@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { request } from '../../utils/myFetch';
-import { catService } from '../../service';
+import { createPortal } from 'react-dom';
+import { request } from '../../../utils/myFetch';
+import { catService } from '../../../service';
+import { useDispatch } from 'react-redux';
+import { setError } from '../../../store/slSlice';
 import styles from './AdoptFormModal.module.css';
 
 interface AdoptFormModalProps {
     onClose: () => void;
     catName?: string;
+    catAvatar?: string;
     catId?: string;
 }
 // 添加响应类型定义
@@ -28,7 +32,8 @@ interface CatDetail {
     position: string;
     story: string;
 }
-export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName, catId }) => {
+export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName, catAvatar, catId }) => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const { id } = useParams();
     const catIdParam = catId || id;
@@ -41,7 +46,7 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
     const [submitting, setSubmitting] = useState(false);
     const [catInfo, setCatInfo] = useState({
         name: catName || '',
-        avatar: '',
+        avatar: catAvatar || '',
         gender: '',
         neutered: ''
     });
@@ -88,50 +93,42 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
         e.preventDefault();
 
         if (!formData.contact.trim()) {
-            alert('请填写联系方式');
+            dispatch(setError('请填写联系方式'));
             return;
         }
         if (!formData.reason.trim()) {
-            alert('请填写领养原因');
+            dispatch(setError('请填写领养原因'));
+            return;
+        }
+        if (!catIdParam) {
+            dispatch(setError('猫咪信息异常，请返回重试'));
             return;
         }
 
         setSubmitting(true);
 
         try {
-            // 调用创建猫咪接口
-            const res = await request<ApiResponse>({
-                url: '/cats',
-                method: 'POST',
-                data: {
-                    name: catInfo.name,
-                    gender: catInfo.gender === '弟弟' ? 1 : 0,
-                    neutered_status: catInfo.neutered === '已绝育' ? 1 : 2,
-                    birth_date: "2022-01-01",
-                    arrival_date: "2023-01-01",
-                    state: 1,
-                    coat_color: 1,
-                    position: "待领养",
-                    story: `领养人：${formData.contact}，领养原因：${formData.reason}，家庭情况：${formData.situation || '无'}`,
-                    avatar_key: ""
-                },
-                useToken: true
+            const res = await catService.submitAdopt({
+                cat_id: Number(catIdParam),
+                contact_info: formData.contact.trim(),
+                reason: formData.reason.trim(),
+                info: formData.situation.trim() || undefined,
             });
 
             if (res.code === 200) {
-                alert('提交成功！我们会尽快联系您');
+                dispatch(setError('提交成功！我们会尽快联系您'));
                 onClose();
                 navigate('/home');
             } else {
-                alert(res.msg || '提交失败，请稍后重试');
+                dispatch(setError(res.msg || '提交失败，请稍后重试'));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('提交失败:', error);
-            if (error.message?.includes('401')) {
-                alert('请先登录');
+            if (error instanceof Error && error.message?.includes('401')) {
+                dispatch(setError('请先登录'));
                 navigate('/');
             } else {
-                alert('提交失败，请稍后重试');
+                dispatch(setError(error instanceof Error ? error.message : '提交失败，请稍后重试'));
             }
         } finally {
             setSubmitting(false);
@@ -139,16 +136,17 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
     };
 
     if (loading) {
-        return (
+        return createPortal(
             <div className={styles.overlay} onClick={handleBackdropClick}>
                 <div className={styles.modal}>
                     <div className={styles.loading}>加载中...</div>
                 </div>
-            </div>
+            </div>,
+            document.body
         );
     }
 
-    return (
+    return createPortal(
         <div className={styles.overlay} onClick={handleBackdropClick}>
             <div className={styles.modal}>
 
@@ -163,7 +161,7 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
                     {/* 左侧：信息填写 */}
                     <div className={styles.formSection}>
 
-                        <form onSubmit={handleSubmit} className={styles.form}>
+                        <form id='adopt-form' onSubmit={handleSubmit} className={styles.form}>
                             {/* 联系方式 */}
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>
@@ -255,6 +253,7 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
                     </button>
                     <button
                         type="submit"
+                        form='adopt-form'
                         className={styles.submitBtn}
                         disabled={submitting}
                     >
@@ -262,6 +261,7 @@ export const AdoptFormModal: React.FC<AdoptFormModalProps> = ({ onClose, catName
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };

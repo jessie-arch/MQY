@@ -44,38 +44,78 @@ export interface PostsResponse {
     };
 }
 
+export interface PostDetailAuthor {
+    user_id: number;
+    username: string;
+    avatar_url: string;
+}
+
+export interface PostDetailCat {
+    cat_id: number;
+    name: string;
+    avatar: string;
+}
+
+export interface PostDetailStats {
+    is_liked: boolean;
+    like_count: number;
+}
+
+export interface PostDetailItem {
+    post_id: number;
+    title: string;
+    content: string;
+    create_time: string;
+    author: PostDetailAuthor;
+    cat: PostDetailCat;
+    medias: MediaItem[];
+    stats: PostDetailStats;
+}
+
+export interface PostDetailResponse {
+    code: number;
+    msg: string;
+    data: PostDetailItem;
+}
+
 export const postService = {
     // 获取动态列表
     getPosts: (cursor?: string, keyword?: string) => {
-        // 构建 data 对象，只传有值的参数
-        const data: any = {};
+        const data: Record<string, string> = {};
         if (cursor) data.cursor = cursor;
         if (keyword) data.keyword = keyword;
-
-        console.log('getPosts 请求参数:', data);
 
         return request<PostsResponse>({
             url: '/home/posts',
             method: 'GET',
-            data: Object.keys(data).length > 0 ? data : undefined
+            data: Object.keys(data).length > 0 ? data : undefined,
         });
     },
 
     // 获取动态详情
-    getPostDetail: (id: string) => {
-        return request<{ code: number; data: PostItem }>({
-            url: `/post/detail/${id}`,
+    getPostDetail: (id: string | number) => {
+        return request<PostDetailResponse>({
+            url: `/posts/${id}`,
             method: 'GET',
+            useToken: true,
         });
     },
 
-    // 点赞/取消点赞
-    likePost: (postId: number, isLiked: boolean) => {
-        return request({
-            url: `/post/${postId}/like`,
+    // 点赞
+    likePost: (id: number) => {
+        return request<{ code: number; msg: string; data: null }>({
+            url: `/posts/like?id=${id}`,
             method: 'POST',
-            data: { is_liked: isLiked },
-            useToken: true
+            useToken: true,
+        });
+    },
+
+    // 取消点赞
+    unlikePost: (id: number) => {
+        return request<{ code: number; msg: string; data: null }>({
+            url: `/posts/unlike?id=${id}`,
+            method: 'POST',
+            useToken: true,
         });
     },
 };
