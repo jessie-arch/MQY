@@ -5,7 +5,7 @@ import { postService } from '../../../service';
 
 export const useLike = (
     setPosts: Dispatch<SetStateAction<PostItem[]>>,
-    setSearchResults: Dispatch<SetStateAction<any[]>>
+    setSearchResults: Dispatch<SetStateAction<PostItem[]>>
 ) => {
     const handleLike = async (postId: number) => {
         // 先获取当前点赞状态，用于决定调用哪个API
@@ -33,7 +33,7 @@ export const useLike = (
 
         // 更新搜索结果
         setSearchResults(prev =>
-            prev.map((post: any) =>
+            prev.map((post: PostItem) =>
                 post.post_id === postId
                     ? {
                         ...post,
@@ -77,7 +77,7 @@ export const useLike = (
                     )
                 );
                 setSearchResults(prev =>
-                    prev.map((post: any) =>
+                    prev.map((post: PostItem) =>
                         post.post_id === postId
                             ? {
                                 ...post,

@@ -1,22 +1,21 @@
 //整个文件均由章思雨完成
-import { Link,Outlet } from "react-router-dom"
-import { NavCat } from "../shared/navCat"
-import { PostCard } from '../shared/postCard'
-import { CatCard } from '../shared/catCard'
-import { SearchBar } from '../shared/searchBar'
-import { useSearch } from './Home/webSearch';
-import { UserAvatar } from "../shared/userAvatar"
+import { Link, Outlet } from "react-router-dom"
+import { NavCat } from "../../shared/navCat"
+import { PostCard } from '../../shared/postCard'
+import { CatCard } from '../../shared/catCard'
+import { SearchBar } from '../../shared/searchBar'
+import { useSearch } from '../Home/webSearch';
+import { UserAvatar } from "../../shared/userAvatar"
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState, useRef } from "react"
-import { postService, catService, userService } from '../../service'
-import type { PostItem, GalleryCat } from '../../service'
- import BabyThing from "./babyInterset/BabyinterstingThings";
+import { useCallback, useEffect, useState, useRef } from "react"
+import { postService, catService, userService } from '../../../service'
+import type { PostItem, GalleryCat } from '../../../service'
+import BabyThing from "../babyInterset/BabyinterstingThings";
 import style from "./webHome.module.css"
 import pageStyle from "./webHomePage.module.css"
 
 function Home() {
   const [activePage, setActivePage] = useState('life');
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const [postsNextCursor, setPostsNextCursor] = useState('');
@@ -52,7 +51,6 @@ function Home() {
   // 搜索 Hook
   const {
     searchKeyword,
-    setSearchKeyword,
     searchResults,
     setSearchResults,
     isSearching,
@@ -90,12 +88,8 @@ function Home() {
 
     setIsSearching(false);
   };
-  // 登录状态检查回调
-  const handleLoginCheck = (loggedIn: boolean) => {
-    setIsLoggedIn(loggedIn);
-  };
   // 加载动态
-  const loadPosts = async (cursor?: string, force = false) => {
+  const loadPosts = useCallback(async (cursor?: string, force = false) => {
     if (postsLoading || (!postsHasMore && !force)) return;
     setPostsLoading(true);
     try {
@@ -115,7 +109,7 @@ function Home() {
     } finally {
       setPostsLoading(false);
     }
-  };
+  }, [postsHasMore, postsLoading]);
 
   const refreshPosts = async () => {
     setPostsHasMore(true);
@@ -140,7 +134,7 @@ function Home() {
     }
   };
   // 加载图鉴
-  const loadGallery = async (cursor?: string, force = false) => {
+  const loadGallery = useCallback(async (cursor?: string, force = false) => {
     if (galleryLoading || (!galleryHasMore && !force)) return;
     setGalleryLoading(true);
     try {
@@ -160,7 +154,7 @@ function Home() {
     } finally {
       setGalleryLoading(false);
     }
-  };
+  }, [galleryHasMore, galleryLoading]);
 
   useEffect(() => {
     loadPosts();
@@ -178,7 +172,7 @@ function Home() {
     };
 
     loadUserRole();
-  }, []);
+  }, [loadGallery, loadPosts]);
 
   // 无限滚动逻辑...
   useEffect(() => {
@@ -193,7 +187,7 @@ function Home() {
     );
     if (postsLoaderRef.current) observer.observe(postsLoaderRef.current);
     return () => observer.disconnect();
-  }, [activePage, postsLoading, postsHasMore, postsNextCursor]);
+  }, [activePage, postsLoading, postsHasMore, postsNextCursor, loadPosts]);
 
   useEffect(() => {
     if (!isHomeRoot || !restorePage) return;
@@ -244,7 +238,7 @@ function Home() {
     );
     if (galleryLoaderRef.current) observer.observe(galleryLoaderRef.current);
     return () => observer.disconnect();
-  }, [activePage, galleryLoading, galleryHasMore, galleryNextCursor]);
+  }, [activePage, galleryLoading, galleryHasMore, galleryNextCursor, loadGallery]);
 
   const switchToLife = () => {
     clearSearch();
@@ -299,12 +293,9 @@ function Home() {
           searchInputRef={searchInputRef}
           onInputChange={handleSearchInput}
           onSearch={handleSearch}
-          onSelectSuggestion={(sug) => {
-            setSearchKeyword(sug.name);
-            handleSearch(sug.name);
-          }}
+          onSelectSuggestion={selectSuggestion}
         />
-        <UserAvatar onLoginCheck={handleLoginCheck} />
+        <UserAvatar />
       </div>
 
       {/* Chip 标签 */}
@@ -331,7 +322,7 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关动态</div>
-                    : searchResults.map((post) => <PostCard key={post.post_id} post={post} />)}
+                    : searchResults.map((post: PostItem) => <PostCard key={post.post_id} post={post} />)}
               </>
             ) : (
               <>
@@ -358,7 +349,7 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关猫咪</div>
-                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
+                    : searchResults.map((cat: GalleryCat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
               </>
             ) : (
               <>
@@ -385,7 +376,7 @@ function Home() {
               <>
                 {isSearching ? <div className={style.emptyState}>搜索中...</div>
                   : searchResults.length === 0 ? <div className={style.emptyState}>未找到待领养猫咪</div>
-                    : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
+                    : searchResults.map((cat: GalleryCat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
               </>
             ) : (
               <>

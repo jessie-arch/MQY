@@ -2,12 +2,12 @@
 import { lazy} from "react"
 import { createBrowserRouter, Navigate } from "react-router-dom"
 import { getToken } from '.././utils/token';
-const Home = lazy(() => import('../conponents/mobile/mobileHome'));
+const Home = lazy(() => import('../conponents/mobile/pages/mobileHome'));
 const Detail = lazy(() => import('../conponents/mobile/Home/MobilePostDetailModal'));
-const AdoptDetail = lazy(() => import('../conponents/mobile/mobileadoptDetail'));
-const Login = lazy(() => import('../conponents/mobile/mobileLogin'));
-const Register = lazy(() => import('../conponents/mobile/mobileRegister'));
-const User = lazy(() => import('../conponents/mobile/user/mobileUser'));
+const AdoptDetail = lazy(() => import('../conponents/mobile/pages/mobileadoptDetail'));
+const Login = lazy(() => import('../conponents/mobile/pages/mobileLogin'));
+const Register = lazy(() => import('../conponents/mobile/pages/mobileRegister'));
+const User = lazy(() => import('../conponents/mobile/pages/mobileUser'));
 import Layout from '../conponents/shared/globalComponent/layOut'
 import Guard from "./Guard";
 

@@ -1,8 +1,8 @@
 //整个文件均由贺艳完成
-import { useState } from "react";
+import { useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import {AdoptCat} from '../mobile/adoptcatdetail/adoptCatbannel'
-import { MobileAdoptFormModal } from './Home/MobileAdoptFormModal';
+import { AdoptCat } from "../adoptcatdetail/adoptCatbannel"
+import { MobileAdoptFormModal } from "../adoptForm/MobileAdoptFormModal";
 //图鉴加领养内页
 function AdoptDetail() {
     const { id } = useParams();

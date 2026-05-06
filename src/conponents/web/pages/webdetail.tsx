@@ -2,7 +2,7 @@
 import { Link, useParams } from "react-router-dom"
 import { createPortal } from "react-dom"
 import { useEffect, useState } from "react"
-import { postService, type PostDetailItem } from "../../service/postService"
+import { postService, type PostDetailItem } from "../../../service/postService"
 
 function Detail() {
   const { id } = useParams();
@@ -42,7 +42,7 @@ function Detail() {
     if (!detail || liking) return;
 
     const previousStats = detail.stats;
-    const nextIsLiked = !Boolean(previousStats?.is_liked);
+    const nextIsLiked = !previousStats?.is_liked;
     setLiking(true);
     setDetail(prev => (
       prev

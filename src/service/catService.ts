@@ -32,7 +32,7 @@ export interface AdoptParams {
 export interface AdoptResponse {
     code: number;
     msg: string;
-    data?: any;
+    data?: unknown;
 }
 
 export const catService = {

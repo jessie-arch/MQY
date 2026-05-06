@@ -1,16 +1,16 @@
 //整个文件均由章思雨完成
 import { Outlet } from "react-router-dom"
-import { NavCat } from "../shared/navCat"
-import { PostCard } from "../shared/postCard"
-import { CatCard } from "../shared/catCard"
-import { SearchBar } from "../shared/searchBar"
-import { useSearch } from "../web/Home/webSearch"
-import { useEffect, useState, useRef } from "react"
+import { NavCat } from "../../shared/navCat"
+import { PostCard } from "../../shared/postCard"
+import { CatCard } from "../../shared/catCard"
+import { SearchBar } from "../../shared/searchBar"
+import { useSearch } from "../../web/Home/webSearch"
+import { useCallback, useEffect, useState, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { postService, catService, userService } from '../../service'
-import type { PostItem, GalleryCat } from '../../service'
-import {MbabyInterest} from './babyInterest/mBabyInterestThing'
-import { AddCat } from './addCat/addCat'
+import { postService, catService, userService } from '../../../service'
+import type { PostItem, GalleryCat } from '../../../service'
+import { MbabyInterest } from "../babyInterest/mBabyInterestThing"
+import { AddCat } from "../addCat/addCat"
 import style from "../web/webHome.module.css"
 import pageStyle from "../web/webHomePage.module.css"
 
@@ -63,7 +63,7 @@ function MobileHome() {
         currentAdopt: adoptCats,
     });
 
-    const loadPosts = async (cursor?: string) => {
+    const loadPosts = useCallback(async (cursor?: string) => {
         if (postsLoading || !postsHasMore) return;
         setPostsLoading(true);
         try {
@@ -82,9 +82,9 @@ function MobileHome() {
         } finally {
             setPostsLoading(false);
         }
-    };
+    }, [postsHasMore, postsLoading]);
 
-    const loadGallery = async (cursor?: string) => {
+    const loadGallery = useCallback(async (cursor?: string) => {
         if (galleryLoading || !galleryHasMore) return;
         setGalleryLoading(true);
         try {
@@ -103,7 +103,7 @@ function MobileHome() {
         } finally {
             setGalleryLoading(false);
         }
-    };
+    }, [galleryHasMore, galleryLoading]);
  
     const handleAvatarClick = () => {
         navigate('/user');
@@ -125,7 +125,7 @@ function MobileHome() {
         };
 
         void loadUserRole();
-    }, []);
+    }, [loadGallery, loadPosts]);
 
     useEffect(() => {
         if (!isHomeRoot || !restorePage) return;
@@ -151,7 +151,7 @@ function MobileHome() {
         );
         if (postsLoaderRef.current) observer.observe(postsLoaderRef.current);
         return () => observer.disconnect();
-    }, [activePage, postsLoading, postsHasMore, postsNextCursor]);
+    }, [activePage, postsLoading, postsHasMore, postsNextCursor, loadPosts]);
 
     useEffect(() => {
         if (activePage !== 'guide') return;
@@ -165,7 +165,7 @@ function MobileHome() {
         );
         if (galleryLoaderRef.current) observer.observe(galleryLoaderRef.current);
         return () => observer.disconnect();
-    }, [activePage, galleryLoading, galleryHasMore, galleryNextCursor]);
+    }, [activePage, galleryLoading, galleryHasMore, galleryNextCursor, loadGallery]);
 
     const switchToLife = () => {
         clearSearch();
@@ -197,7 +197,7 @@ function MobileHome() {
             )}
               {/*发表动态 */}
         {showAddpost ? (
-            <MbabyInterest      showAddpost={showAddpost}setShowAddpost={setShowAddpost} />
+            <MbabyInterest setShowAddpost={setShowAddpost} />
         ) : (
             <div className={`iconfont icon-jiahao1 ${style.maddPost}`} onClick={() => { setShowAddpost(true); }}></div>
         )}
@@ -257,7 +257,7 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关动态</div>
-                                            : searchResults.map((post) => <PostCard key={post.post_id} post={post} />)}
+                                            : searchResults.map((post: PostItem) => <PostCard key={post.post_id} post={post} />)}
                                 </>
                             ) : (
                                 <>
@@ -284,7 +284,7 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到相关猫咪</div>
-                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
+                                            : searchResults.map((cat: GalleryCat) => <CatCard key={cat.cat_id} cat={cat} sourcePage='guide' />)}
                                 </>
                             ) : (
                                 <>
@@ -311,7 +311,7 @@ function MobileHome() {
                                 <>
                                     {isSearching ? <div className={style.emptyState}>搜索中...</div>
                                         : searchResults.length === 0 ? <div className={style.emptyState}>未找到待领养猫咪</div>
-                                            : searchResults.map((cat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
+                                            : searchResults.map((cat: GalleryCat) => <CatCard key={cat.cat_id} cat={cat} showAdoptBtn sourcePage='adopt' />)}
                                 </>
                             ) : (
                                 <>

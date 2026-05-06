@@ -1,12 +1,12 @@
 //整个文件均由贺艳完成
-import style from '../web/webRegister.module.css'
-import star from '../../assets/img/star.png'
+import style from '../webRegister.module.css'
+import star from '../../../assets/img/star.png'
 import {useState,useEffect,useRef} from 'react'
-import {FetchpreCatdetail,followCat,unfollowCat} from '../../service/adoptCat'
+import {FetchpreCatdetail,followCat,unfollowCat} from '../../../service/adoptCat'
 import { useDispatch } from 'react-redux'
-import { setError } from '../../store/slSlice'
-import {staterOptions,neuteredStatusOptios} from '../shared/data'
-import type {selectdatatype} from '../shared/data'
+import { setError } from '../../../store/slSlice'
+import {staterOptions,neuteredStatusOptios} from '../../shared/data'
+import type {selectdatatype} from '../../shared/data'
 type CatDetail = {
   story: string
   status: number | null
@@ -59,7 +59,7 @@ export function Adoptbannel ({CatId}: {CatId: number}) {
           avatar:res.data.avatar
         }))
         setFollowflag(true);
-      } catch (error) {
+      } catch {
        dispatch(setError('加载失败了喵, 请刷新后再试吧'))
       } finally {
         if (mounted) setLoading(false)
@@ -68,7 +68,7 @@ export function Adoptbannel ({CatId}: {CatId: number}) {
     return () => {
       mounted = false
     }
-  },[CatId])
+  },[CatId, dispatch])
 
   //处理关注
   const Handlefollow = () => {
@@ -91,7 +91,7 @@ export function Adoptbannel ({CatId}: {CatId: number}) {
         } else {
           await followCat(CatId)
         }
-      } catch (error) {
+      } catch {
         dispatch(setError('更新关注状态失败，请稍后再试'))
         setDetail(pre => ({
           ...pre,

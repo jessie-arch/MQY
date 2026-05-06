@@ -85,7 +85,7 @@ export async function post (props:HandleProps) {
   
 //主角搜索
 export async function SearchMainCat (keyword:string) :Promise<searchCatResType>{
-  let res: searchCatResType = await request({
+  const res: searchCatResType = await request({
     url:`/posts/suggest?keyword=${keyword}`,
     method:'GET',
   })

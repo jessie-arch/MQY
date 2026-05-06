@@ -1,6 +1,6 @@
 //整个文件均由贺艳完成
 import style from '../shared/register/RegitserLoginbackkgroud.module.css'
-import { LoginBannel } from '../shared/login/loginBannel';
+import { LoginBannel } from '../../shared/login/loginBannel';
 
 //登录页
 function Login() {

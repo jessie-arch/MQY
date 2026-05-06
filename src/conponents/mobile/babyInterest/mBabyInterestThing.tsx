@@ -8,7 +8,7 @@ import type {PreMediaProps,HandleProps,mediatype} from '../../../service/submitp
 import {Msearch } from '../babyInterest/mSearchMaincat'
 import type { mainCatType } from '../babyInterest/mSearchMaincat'
 
-export function MbabyInterest ({setShowAddpost}:{showAddpost:boolean;setShowAddpost:React.Dispatch<React.SetStateAction<boolean>>}) {
+export function MbabyInterest ({setShowAddpost}:{setShowAddpost:React.Dispatch<React.SetStateAction<boolean>>}) {
    const [mediasType,setMediasType] = useState<mediatype>("IMAGE")
   const [isSubmitting, setIsSubmitting] = useState(false)
      const dispatch = useDispatch(); 

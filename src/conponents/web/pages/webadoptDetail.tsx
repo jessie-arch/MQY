@@ -2,8 +2,8 @@
  import { useEffect } from "react";
  import { useState } from "react";
  import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { Adoptbannel } from "./adoptCatdetail/adoptBannel";
-import { AdoptFormModal } from "./Home/AdoptFormModal";
+import { Adoptbannel } from "../adoptCatdetail/adoptBannel";
+import { AdoptFormModal } from "../adoptForm/AdoptFormModal";
  //图鉴加领养内页
  function AdoptDetail () {
    const { id } = useParams();

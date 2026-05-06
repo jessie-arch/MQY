@@ -2,12 +2,12 @@ import { lazy } from "react"
 import {getToken} from '.././utils/token'
 import Guard from "./Guard";
 import { createBrowserRouter, Navigate } from "react-router-dom"
-const Home = lazy(() => import('../conponents/web/webHome'));
+const Home = lazy(() => import('../conponents/web/pages/webHome'));
 const Detail = lazy(() => import('../conponents/web/Home/PostDetailModal'));
-const AdoptDetail = lazy(() => import('../conponents/web/webadoptDetail'));
+const AdoptDetail = lazy(() => import('../conponents/web/pages/webadoptDetail'));
 const AddCat = lazy(() => import('../conponents/web/addCat/addCat').then((m) => ({ default: m.AddCat })));
-const Login = lazy(() => import('../conponents/web/weblogin').then((m) => ({ default: m.Login })));
-const Register = lazy(() => import('../conponents/web/webRegister').then((m) => ({ default: m.Register })));
+const Login = lazy(() => import('../conponents/web/pages/weblogin').then((m) => ({ default: m.Login })));
+const Register = lazy(() => import('../conponents/web/pages/webRegister').then((m) => ({ default: m.Register })));
 import Layout from '../conponents/shared/globalComponent/layOut'
 
 

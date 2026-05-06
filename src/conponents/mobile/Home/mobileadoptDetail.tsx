@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom"
 
-import { MobileAdoptFormModal } from './MobileAdoptFormModal';
+import { MobileAdoptFormModal } from '../adoptForm/MobileAdoptFormModal';
 
 function MobileAdoptDetail() {
     const { id } = useParams();
